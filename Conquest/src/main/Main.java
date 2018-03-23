@@ -1,18 +1,15 @@
 package main;
 
 import static org.lwjgl.glfw.GLFW.*;
-import static org.lwjgl.opengl.GL11.*;
 import renderEngine.Renderer;
-
-import org.lwjgl.opengl.GL;
-
 //import input.Input;
-import renderEngine.Renderer;
+
 import renderEngine.Window;
 
 public class Main implements Runnable {
 	private boolean running = false;
 	private Thread renderingThread;
+
 	private Window window = new Window();
 	private Renderer renderer = new Renderer();
 	
@@ -56,12 +53,16 @@ public class Main implements Runnable {
 			if(glfwWindowShouldClose(window.windowHandle)) {
 				glfwTerminate();
 				running = false;
+				
+				glfwDestroyWindow(window.windowHandle);
+				window.keycallback.free();
 			}
 		}
 		
 	}
 	
 	public void update() {
+		glfwSwapBuffers(window.windowHandle);
 		glfwPollEvents();
 		
 		if (window.keys[GLFW_KEY_SPACE] == true) {
@@ -76,3 +77,4 @@ public class Main implements Runnable {
 	
 
 }
+
