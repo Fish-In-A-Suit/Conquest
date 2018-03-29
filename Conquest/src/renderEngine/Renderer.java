@@ -6,7 +6,7 @@ import static org.lwjgl.opengl.GL30.*;
 
 /**
  * 
- * @author Aljoöa
+ * @author Aljo≈°a
  * 
  * This class deals with rendering to the window
  */
@@ -27,7 +27,7 @@ public class Renderer {
 		glBindVertexArray(mesh.getVaoID());
 		glEnableVertexAttribArray(0);
 
-        //System.out.println("vertexCount of mesh prior to glDrawArrays: " + mesh.getVertexCount());
+                //System.out.println("vertexCount of mesh prior to glDrawArrays: " + mesh.getVertexCount());
 		
 		glDrawArrays(GL_TRIANGLES, 0, mesh.getVertexCount());
 		glDisableVertexAttribArray(0);
