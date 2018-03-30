@@ -27,9 +27,10 @@ public class Renderer {
 		glBindVertexArray(mesh.getVaoID());
 		glEnableVertexAttribArray(0);
 
-                //System.out.println("vertexCount of mesh prior to glDrawArrays: " + mesh.getVertexCount());
+        //System.out.println("vertexCount of mesh prior to glDrawArrays: " + mesh.getVertexCount());
 		
-		glDrawArrays(GL_TRIANGLES, 0, mesh.getVertexCount());
+		//glDrawArrays(GL_TRIANGLES, 0, mesh.getVertexCount());
+		glDrawElements(GL_TRIANGLES, mesh.getVertexCount(), GL_UNSIGNED_INT, 0);
 		glDisableVertexAttribArray(0);
 		glBindVertexArray(0);
 	}

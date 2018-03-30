@@ -10,22 +10,24 @@ import renderEngine.Window;
 
 public class Main implements Runnable {
 	private boolean running = false;
-	private boolean assertions = true;
+	private boolean assertions = false;
 	private Thread renderingThread;
 
 	private Window window = new Window();
 	private Renderer renderer = new Renderer();
 	private Mesh mesh;
 	
-	float positions[] = {
-			// Left bottom triangle
-            -0.5f, 0.5f, 0f,
-            -0.5f, -0.5f, 0f,
-            0.5f, -0.5f, 0f,
-            // Right top triangle
-            0.5f, -0.5f, 0f,
-            0.5f, 0.5f, 0f,
-            -0.5f, 0.5f, 0f
+	float[] positions = {
+            -0.5f, 0.5f, 0f, //VO
+            -0.5f, -0.5f, 0f, //V1
+            
+            0.5f, -0.5f, 0f, //V2
+            0.5f, 0.5f, 0f //V3
+	};
+	
+	int[] indices = {
+		0, 1, 3, //top left triangle (V0, V1, V3)
+		3, 1, 2 //bottom right triangle (V3, V1, V2)
 	};
 
 	private void start() {
@@ -37,7 +39,7 @@ public class Main implements Runnable {
 	
 	public void run() {
 		window.init();
-		setupMesh(positions);
+		setupMesh(positions, indices);
 		
 		long lastTime = System.nanoTime();
 		double delta = 0.0;
@@ -90,8 +92,8 @@ public class Main implements Runnable {
 		}
 	}
 	
-	public void setupMesh(float[] vertices) {
-		mesh = new Mesh(vertices);
+	public void setupMesh(float[] vertices, int[] indices) {
+		mesh = new Mesh(vertices, indices);
 	}
 
 	private void runAssertions()  {
