@@ -22,7 +22,12 @@ public class Window {
 	
 	public boolean[] keys = new boolean[35565];
 
-	
+	/**
+	 * This method creates the window with it's associated OpenGL context. It also:
+	 *   - sets up a size callback
+	 *   - sets up a key callback
+	 *   - positions the window to the contre of the screen
+	 */
 	public void init() {
 		if(!glfwInit()) {
 			throw new IllegalStateException("Unable to initialize GLFW!");

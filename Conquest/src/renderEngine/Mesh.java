@@ -9,7 +9,7 @@ import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL20.*;
 import static org.lwjgl.opengl.GL30.*;
 
-import org.lwjgl.BufferUtils;
+import utils.BufferUtilities;
 
 /**
  * @author Aljoša
@@ -41,14 +41,9 @@ public class Mesh {
 			verticesVboID = glGenBuffers();
 			vbos.add(verticesVboID);
 			
-			verticesBuffer = BufferUtils.createFloatBuffer(vertices.length);
-			verticesBuffer.put(vertices);
+			verticesBuffer = BufferUtilities.storeDataInFloatBuffer(vertices);
 			checkVerticesBufferContent(vertices);
-			verticesBuffer.flip();
-			System.out.println("State of verticesBuffer after being flipped: " + verticesBuffer.toString());
 
-			System.out.println("Number of vertices: " + vertexCount);
-			
 			glBindBuffer(GL_ARRAY_BUFFER, verticesVboID);
 			glBufferData(GL_ARRAY_BUFFER, verticesBuffer, GL_STATIC_DRAW);
 			glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0);
@@ -68,47 +63,55 @@ public class Mesh {
 		vbos.add(indicesVboID);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indicesVboID);
 		
-		IntBuffer indicesBuffer = storeDataInIntBuffer(indices);
+		IntBuffer indicesBuffer = BufferUtilities.storeDataInIntBuffer(indices);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, indicesBuffer, GL_STATIC_DRAW);
+		
 	}
+	
 	/**
-	 * @param data
-	 * @return indicesBuffer
-	 * 
-	 * This method stores an array of indices into an IntBuffer
+	 * @return vaoID - the int reference to the vertex array object associated with a particular instance of Mesh
 	 */
-	private IntBuffer storeDataInIntBuffer(int[] data) {
-		IntBuffer indicesBuffer = BufferUtils.createIntBuffer(data.length);
-		indicesBuffer.put(data);
-		indicesBuffer.flip();
-		return indicesBuffer;
-	}
-
 	public int getVaoID() {
 		return vaoID;
 	}
-
+	
+	/**
+	 * @return vertexCount - the amount of vertices of a particular instance of Mesh
+	 */
 	public int getVertexCount() {
 		return vertexCount;
 	}
 	
+	/**
+	 * @return verticesVboID - the int reference to the buffer object which stores the vertices of a
+	 * particular mesh instance
+	 */
 	public int getVerticesVboID() {
 		return verticesVboID;
 	}
 	
+	/**
+	 * @returnndicesVboID - the int reference to the  buffer object which stores the indices of a particular
+	 * mesh instance
+	 */
 	public int getIndicesVboID() {
 		return indicesVboID;
 	}
 	
+	/**
+	 * @param vertices
+	 * 
+	 * This is a debugging method for checking the contents of the verticesBuffer
+	 */
 	public void checkVerticesBufferContent(float vertices[]) {
 		int i = 0;
 		System.out.print("The contents of vertices array: ");
 		
 		for (float vertex : vertices) {
 			System.out.print("[" + ++i + "]" + verticesBuffer.get((int)vertex) + ", ");
-		}
-		
+		}	
 		System.out.println();
+		System.out.println("Number of vertices: " + vertexCount);	
 		
 		System.out.println("State of verticesBuffer after putting data in but prior to flipping it: " + 
 		                   verticesBuffer.toString());
@@ -120,6 +123,9 @@ public class Mesh {
 		}
 	}
 	
+	/**
+	 * Removes the mesh instance from memory
+	 */
 	public void cleanUp() {
 		glDisableVertexAttribArray(0);
 		

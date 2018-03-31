@@ -7,15 +7,20 @@ import renderEngine.Renderer;
 //import input.Input;
 
 import renderEngine.Window;
+import utils.Timer;
 
 public class Main implements Runnable {
 	private boolean running = false;
 	private boolean assertions = false;
 	private Thread renderingThread;
+	
+	public static final int TARGET_FPS = 75;
+	public static final int TARGET_UPS = 30;
 
 	private Window window = new Window();
 	private Renderer renderer = new Renderer();
 	private Mesh mesh;
+	private Timer timer = new Timer();
 	
 	float[] positions = {
             -0.5f, 0.5f, 0f, //VO
@@ -38,9 +43,17 @@ public class Main implements Runnable {
 	}
 	
 	public void run() {
+		init();
+		gameLoop();
+	}
+	
+	private void init() {
 		window.init();
+		timer.init();
 		setupMesh(positions, indices);
-		
+	}
+	
+	private void gameLoop() {
 		long lastTime = System.nanoTime();
 		double delta = 0.0;
 		double ns = 1000000000.0 / 60.0;
@@ -80,7 +93,6 @@ public class Main implements Runnable {
 				glfwTerminate();
 			}
 		}
-				
 	}
 	
 	public void update() {
