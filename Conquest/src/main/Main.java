@@ -73,11 +73,11 @@ public class Main implements Runnable {
 			}
 					
 			if(glfwWindowShouldClose(window.windowHandle)) {
-				glfwTerminate();
 				running = false;
-
-				glfwDestroyWindow(window.windowHandle);
+				mesh.cleanUp();
 				window.keycallback.free();
+				glfwDestroyWindow(window.windowHandle);
+				glfwTerminate();
 			}
 		}
 				

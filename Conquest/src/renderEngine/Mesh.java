@@ -19,6 +19,7 @@ import org.lwjgl.BufferUtils;
 public class Mesh {
 	private int vaoID;
 	private int verticesVboID;
+	private int indicesVboID;
 	private int vertexCount;
 	private FloatBuffer verticesBuffer;
 	
@@ -63,7 +64,7 @@ public class Mesh {
 	 * This methods loads up the indices buffer and binds it to the vao
 	 */
 	private void bindIndicesBuffer(int[] indices)  {
-		int indicesVboID = glGenBuffers();
+		indicesVboID = glGenBuffers();
 		vbos.add(indicesVboID);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indicesVboID);
 		
@@ -95,6 +96,10 @@ public class Mesh {
 		return verticesVboID;
 	}
 	
+	public int getIndicesVboID() {
+		return indicesVboID;
+	}
+	
 	public void checkVerticesBufferContent(float vertices[]) {
 		int i = 0;
 		System.out.print("The contents of vertices array: ");
@@ -120,6 +125,9 @@ public class Mesh {
 		
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		glDeleteBuffers(verticesVboID);
+		
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+		glDeleteBuffers(indicesVboID);
 		
 		glBindVertexArray(0);
 		glDeleteVertexArrays(vaoID);
