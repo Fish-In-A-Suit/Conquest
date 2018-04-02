@@ -54,11 +54,12 @@ Changes:
 
 ### Snapshot 0.5.2: code improvements
 Additions:
-    - added Timer class which deals with time measurements
-    - added BufferUtilities class, which enables you to create various types of buffers with only one line of code, instead of manually specifying the buffer creation process each time (which takes about 3-4 lines of code)
+  - added Timer class which deals with time measurements
+  - added BufferUtilities class, which enables you to create various types of buffers with only one line of code, instead of manually specifying the buffer creation process each time (which takes about 3-4 lines of code)
+
 Changes:
-    - restructured the run() method of the Main class, so the game loop now has a separate method (gameLoop()).
-    - better code documentation of certain parts of the source code
+  - restructured the run() method of the Main class, so the game loop now has a separate method (gameLoop()).
+  - better code documentation of certain parts of the source code
 
 ## Snapshot 0.6: added shader support
 Additions:
