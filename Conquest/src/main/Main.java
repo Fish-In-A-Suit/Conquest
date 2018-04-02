@@ -11,7 +11,7 @@ import utils.Timer;
 
 public class Main implements Runnable {
 	private boolean running = false;
-	private boolean assertions = false;
+	private boolean assertions = true;
 	private Thread renderingThread;
 	
 	public static final int TARGET_FPS = 75;
@@ -43,12 +43,17 @@ public class Main implements Runnable {
 	}
 	
 	public void run() {
-		init();
+		try {
+			init();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		gameLoop();
 	}
 	
-	private void init() {
+	private void init() throws Exception {
 		window.init();
+		renderer.init();
 		timer.init();
 		setupMesh(positions, indices);
 	}
@@ -71,8 +76,7 @@ public class Main implements Runnable {
 				updates ++;
 				delta--;
 			}
-			renderer.clear();
-		    renderer.render(window, mesh);
+			renderer.render(window, mesh);		    
 			frames++;
 					
 			if (System.currentTimeMillis() - timer > 1000) {
@@ -117,6 +121,8 @@ public class Main implements Runnable {
 		
 		System.out.println("vaoID of mesh: " + mesh.getVaoID());
 		System.out.println("Width: " + window.getWidth() + ", Height: " + window.getHeight() );
+		
+		renderer.runAssertions();
 	}
 	
 	public static void main(String[] args) {
