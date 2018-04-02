@@ -1,7 +1,6 @@
 package renderEngine;
 
 import static org.lwjgl.glfw.GLFW.*;
-
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.system.MemoryUtil.*;
 
@@ -14,12 +13,21 @@ import org.lwjgl.opengl.GL;
 public class Window {
 	public long windowHandle;
 	public GLFWKeyCallback keycallback;
+	
 	private int width = 1920;
 	private int height = 1080;
 	private String title = "Conquest" ;
 	
-	public boolean[] keys = new boolean[35565];
+	private boolean resized = false;
 	
+	public boolean[] keys = new boolean[35565];
+
+	/**
+	 * This method creates the window with it's associated OpenGL context. It also:
+	 *   - sets up a size callback
+	 *   - sets up a key callback
+	 *   - positions the window to the contre of the screen
+	 */
 	public void init() {
 		if(!glfwInit()) {
 			throw new IllegalStateException("Unable to initialize GLFW!");
@@ -39,6 +47,12 @@ public class Window {
 			throw new RuntimeException("Failed to create the GLFW window!");
 		}
 		
+		glfwSetFramebufferSizeCallback(windowHandle, (window, width, height) -> {
+			this.width = width;
+			this.height = height;
+			this.setResized(true);
+		});
+		
 		glfwSetKeyCallback(windowHandle, keycallback = GLFWKeyCallback.create((window, key, scancode, action, mods) -> {
 			if (action != GLFW_RELEASE) {
 				keys[key] = true;
@@ -56,8 +70,26 @@ public class Window {
 		glfwShowWindow(windowHandle);
 		
 		GL.createCapabilities();
-
+		
 		glEnable(GL_DEPTH_TEST);
+		
 		System.out.println("OpenGL version: " + glGetString(GL_VERSION));
 	}
+	
+	public void setResized(boolean resized) {
+		this.resized = resized;
+	}
+	
+	public boolean isResized() {
+		return false;
+	}
+
+	public int getWidth() {
+		return width;
+	}
+
+	public int getHeight() {
+		return height;
+	}
+
 }

@@ -1,18 +1,40 @@
 package main;
 
 import static org.lwjgl.glfw.GLFW.*;
+
+import renderEngine.Mesh;
 import renderEngine.Renderer;
 //import input.Input;
 
 import renderEngine.Window;
+import utils.Timer;
 
 public class Main implements Runnable {
 	private boolean running = false;
+	private boolean assertions = true;
 	private Thread renderingThread;
+	
+	public static final int TARGET_FPS = 75;
+	public static final int TARGET_UPS = 30;
 
 	private Window window = new Window();
 	private Renderer renderer = new Renderer();
+	private Mesh mesh;
+	private Timer timer = new Timer();
 	
+	float[] positions = {
+            -0.5f, 0.5f, 0f, //VO
+            -0.5f, -0.5f, 0f, //V1
+            
+            0.5f, -0.5f, 0f, //V2
+            0.5f, 0.5f, 0f //V3
+	};
+	
+	int[] indices = {
+		0, 1, 3, //top left triangle (V0, V1, V3)
+		3, 1, 2 //bottom right triangle (V3, V1, V2)
+	};
+
 	private void start() {
 		running = true;
 		renderingThread = new Thread(this, "renderingThread");
@@ -21,8 +43,22 @@ public class Main implements Runnable {
 	}
 	
 	public void run() {
+		try {
+			init();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		gameLoop();
+	}
+	
+	private void init() throws Exception {
 		window.init();
-		
+		renderer.init();
+		timer.init();
+		setupMesh(positions, indices);
+	}
+	
+	private void gameLoop() {
 		long lastTime = System.nanoTime();
 		double delta = 0.0;
 		double ns = 1000000000.0 / 60.0;
@@ -34,31 +70,33 @@ public class Main implements Runnable {
 			long now = System.nanoTime();
 			delta += (now - lastTime) / ns;
 			lastTime = now;
-			
+					
 			if (delta >= 1.0) {
 				update();
 				updates ++;
 				delta--;
 			}
-			renderer.render();
+			renderer.render(window, mesh);		    
 			frames++;
-			
+					
 			if (System.currentTimeMillis() - timer > 1000) {
 				timer += 1000;
 				System.out.println(updates + " ups, " + frames + " fps");
 				updates = 0;
 				frames = 0;
+				if (assertions == true) {
+					runAssertions();
+				}
 			}
-			
+					
 			if(glfwWindowShouldClose(window.windowHandle)) {
-				glfwTerminate();
 				running = false;
-				
-				glfwDestroyWindow(window.windowHandle);
+				mesh.cleanUp();
 				window.keycallback.free();
+				glfwDestroyWindow(window.windowHandle);
+				glfwTerminate();
 			}
 		}
-		
 	}
 	
 	public void update() {
@@ -69,12 +107,26 @@ public class Main implements Runnable {
 			System.out.println("SPACEBAR was pressed");
 		}
 	}
+	
+	public void setupMesh(float[] vertices, int[] indices) {
+		mesh = new Mesh(vertices, indices);
+	}
 
+	private void runAssertions()  {
+		if (mesh == null)  {
+			System.out.println("Mesh == null!");
+		} else  {
+			System.out.println("Mesh exists");
+		}
+		
+		System.out.println("vaoID of mesh: " + mesh.getVaoID());
+		System.out.println("Width: " + window.getWidth() + ", Height: " + window.getHeight() );
+		
+		renderer.runAssertions();
+	}
 	
 	public static void main(String[] args) {
 		new Main().start();
-	}
-	
-
+	}	
 }
 
