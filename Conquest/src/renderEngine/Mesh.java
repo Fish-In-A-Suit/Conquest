@@ -12,60 +12,109 @@ import static org.lwjgl.opengl.GL30.*;
 import utils.BufferUtilities;
 
 /**
- * @author Aljoša
  * The main responsibility of this class is to collect 3D vertices, store them in
  * VRAM and provide a way to access them (used by Renderer to render them to the window)
+ * 
+ * @author Aljoša
  */
 public class Mesh {
 	private int vaoID;
 	private int verticesVboID;
 	private int indicesVboID;
+	private int colourVboID;
 	private int vertexCount;
+	
 	private FloatBuffer verticesBuffer;
+	private FloatBuffer colourBuffer;
 	
 	ArrayList<Integer> vbos = new ArrayList<>();
 	ArrayList<Integer> vaos = new ArrayList<>();
 	
-	public Mesh(float[] vertices, int[] indices) {
-		// FloatBuffer verticesBuffer = null;
+	public Mesh(float[] vertices, int[] indices, float[] colours) {
 
 			//vertexCount = vertices.length/3;
 		    vertexCount = indices.length;
 			
+		    System.out.println("[Mesh] Creating and binding the vao (vaoID)");
 			vaoID = glGenVertexArrays();
 			vaos.add(vaoID);
 			glBindVertexArray(vaoID);
 			
 			bindIndicesBuffer(indices);
 			
-			verticesVboID = glGenBuffers();
-			vbos.add(verticesVboID);
+			setupColourVbo(colours);
 			
-			verticesBuffer = BufferUtilities.storeDataInFloatBuffer(vertices);
-			checkVerticesBufferContent(vertices);
+			setupVerticesVbo(vertices);
 
-			glBindBuffer(GL_ARRAY_BUFFER, verticesVboID);
-			glBufferData(GL_ARRAY_BUFFER, verticesBuffer, GL_STATIC_DRAW);
-			glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0);
-			
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 			glBindVertexArray(0);
-
 	}
 	
 	/**
-	 * @param indices - an array of indices to be loaded into the indices vbo
-	 * 
 	 * This methods loads up the indices buffer and binds it to the vao
+	 * 
+	 * @param indices - an array of indices to be loaded into the indices vbo 
 	 */
 	private void bindIndicesBuffer(int[] indices)  {
+		System.out.println("[Mesh] Binding indices to a vbo... ");
+		
+		System.out.println("   - [Mesh] Creating vbo (indicesVboID)...");
 		indicesVboID = glGenBuffers();
 		vbos.add(indicesVboID);
+		
+		System.out.println("   - [Mesh] Binding indicesVboID to GL_ELEMENT_ARRAY_BUFFER...");
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indicesVboID);
 		
+		System.out.println("   - [Mesh] Creating an IntBuffer to store the array of indices (indicesBuffer)...");
 		IntBuffer indicesBuffer = BufferUtilities.storeDataInIntBuffer(indices);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, indicesBuffer, GL_STATIC_DRAW);
 		
+		System.out.println("   - [Mesh] Buffering data from indicesBuffer to GL_ELEMENT_ARRAY_TARGET...");
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, indicesBuffer, GL_STATIC_DRAW);
+	}
+	
+	/**
+	 * This method sets up the colour vbo for a mesh object (buffers data to it and assigns it to attribute list
+	 * index 1 of the vao)
+	 * 
+	 * @param colours - an array of colours of the vertices of a model
+	 */
+	private void setupColourVbo(float[] colours) {
+		System.out.println("[Mesh] Creating colour vbo (colourVboID)...");
+		colourVboID = glGenBuffers();
+		vbos.add(colourVboID);
+		
+		System.out.println("   - [Mesh] Creating colour buffer (colourBuffer)...");
+		colourBuffer = BufferUtilities.storeDataInFloatBuffer(colours);
+		
+		System.out.println("   - [Mesh] Binding colourVboID to GL_ARRAY_BUFER...");
+		glBindBuffer(GL_ARRAY_BUFFER, colourVboID);
+		
+		System.out.println("   - [Mesh] Buffering data from colourBuffer to GL_ARRAY_BUFFER...");
+		glBufferData(GL_ARRAY_BUFFER, colourBuffer, GL_STATIC_DRAW);
+		
+		System.out.println("   - [Mesh] Sending colour vbo to index 1 of the active vao...");
+		glVertexAttribPointer(1, 3, GL_FLOAT, false, 0, 0);
+	}
+	
+	private void setupVerticesVbo(float[] vertices) {
+		System.out.println("[Mesh] Creating vertices vbo (verticesVboID)...");
+		
+		System.out.println("   - [Mesh] creating vertices vbo (verticesVboID) and verticers buffer (verticesBuffer)..."); 
+		verticesVboID = glGenBuffers();
+		vbos.add(verticesVboID);
+		verticesBuffer = BufferUtilities.storeDataInFloatBuffer(vertices);
+		
+		System.out.println("   - [Mesh] Checking vertices");
+		checkVertices(vertices);
+		
+		System.out.println("   - [Mesh] Binding verticesVboID to GL_ARRAY_BUFFER...");
+		glBindBuffer(GL_ARRAY_BUFFER, verticesVboID);
+		
+		System.out.println("   - [Mesh] Buffering data of verticesBuffer to GL_ARRAY_BUFFER");
+		glBufferData(GL_ARRAY_BUFFER, verticesBuffer, GL_STATIC_DRAW);
+		
+		System.out.println("   - [Mesh] Sending verticesVboID to attribute list index 0 of the active vao...");
+		glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0);
 	}
 	
 	/**
@@ -91,7 +140,7 @@ public class Mesh {
 	}
 	
 	/**
-	 * @returnndicesVboID - the int reference to the  buffer object which stores the indices of a particular
+	 * @return  indicesVboID - the int reference to the  buffer object which stores the indices of a particular
 	 * mesh instance
 	 */
 	public int getIndicesVboID() {
@@ -99,27 +148,27 @@ public class Mesh {
 	}
 	
 	/**
-	 * @param vertices
-	 * 
 	 * This is a debugging method for checking the contents of the verticesBuffer
+	 * 
+	 * @param vertices
 	 */
-	public void checkVerticesBufferContent(float vertices[]) {
+	public void checkVertices(float vertices[]) {
 		int i = 0;
-		System.out.print("The contents of vertices array: ");
+		System.out.print("      - [Mesh] The contents of vertices array: ");
 		
 		for (float vertex : vertices) {
 			System.out.print("[" + ++i + "]" + verticesBuffer.get((int)vertex) + ", ");
 		}	
-		System.out.println();
-		System.out.println("Number of vertices: " + vertexCount);	
+
+		System.out.println("\n" + "      - [Mesh] Number of vertices: " + vertexCount);	
 		
-		System.out.println("State of verticesBuffer after putting data in but prior to flipping it: " + 
+		System.out.println("      - [Mesh] State of verticesBuffer after putting data in but prior to flipping it: " + 
 		                   verticesBuffer.toString());
 	
 		if(verticesBuffer.hasArray()) {
-			System.out.println("verticesBuffer is backed by an accessible float array");
+			System.out.println("      - [Mesh] verticesBuffer is backed by an accessible float array");
 		} else {
-			System.out.println("verticesBuffer isn't backed by an accessible float array!");
+			System.out.println("      - [Mesh] verticesBuffer isn't backed by an accessible float array!");
 		}
 	}
 	
@@ -127,6 +176,7 @@ public class Mesh {
 	 * Removes the mesh instance from memory
 	 */
 	public void cleanUp() {
+		System.out.println("[Mesh] cleaning up the mesh object");
 		glDisableVertexAttribArray(0);
 		
 		glBindBuffer(GL_ARRAY_BUFFER, 0);

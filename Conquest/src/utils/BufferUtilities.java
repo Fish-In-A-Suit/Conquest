@@ -23,9 +23,9 @@ public class BufferUtilities {
 	public static FloatBuffer storeDataInFloatBuffer(float[] array) {
 		FloatBuffer result = BufferUtils.createFloatBuffer(array.length);
 		result.put(array);
-		System.out.println("State of the floatBuffer prior to being flipped: " + result.toString());
+		//System.out.println("State of the floatBuffer prior to being flipped: " + result.toString());
 		result.flip();
-		System.out.println("State of the floatBuffer after being flipped: " + result.toString());
+		//System.out.println("State of the floatBuffer after being flipped: " + result.toString());
 		return result;
 	}
 	

@@ -9,10 +9,9 @@ import shaders.ShaderProgram;
 import utils.FileUtilities;
 
 /**
- * 
+ * This class deals with rendering to the window
  * @author Aljoša
  * 
- * This class deals with rendering to the window
  */
 public class Renderer {
 	
@@ -21,17 +20,42 @@ public class Renderer {
 	public Renderer() {
 	}
 	
+	/**
+	 * This method creates shaders and starts executing them
+	 * 
+	 * @throws Exception 
+	 */
 	public void init() throws Exception {
+		System.out.println("[Renderer] Initializing renderer... ");
 		shaderProgram = new ShaderProgram();
+		
+		System.out.println("[Renderer] Creating vertex shader... ");
 		shaderProgram.createVertexShader(FileUtilities.loadResource("/shaders/vertexShader.vs"));
+		
+		System.out.println("[Renderer] Creating fragment shader... ");
 		shaderProgram.createFragmentShader(FileUtilities.loadResource("/shaders/fragmentShader.fs"));
+		
+		//shaderProgram.defineMappings();
+		
+		System.out.println("[Renderer] Linking shaderProgram... ");
 		shaderProgram.link();
 	}
+	
+	/**
+	 * This method clears the background colour of the screen
+	 */
 	public void clear() {
 		glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	}
 	
+	/**
+	 * This method handles window resize events and draws the specified Mesh
+	 * instance onto the window.
+	 * 
+	 * @param window The window object
+	 * @param mesh An instance of Mesh class which we want to render 
+	 */
 	public void render(Window window, Mesh mesh) {
 		clear();
 		
@@ -44,6 +68,7 @@ public class Renderer {
 
 		glBindVertexArray(mesh.getVaoID());
 		glEnableVertexAttribArray(0);
+		glEnableVertexAttribArray(1);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.getIndicesVboID());
 
 		glDrawElements(GL_TRIANGLES, mesh.getVertexCount(), GL_UNSIGNED_INT, 0);
@@ -55,14 +80,17 @@ public class Renderer {
 		shaderProgram.unbind();
 	}
 	
+	/**
+	 * This method removes the active shader program from memory
+	 */
 	public void cleanup() {
 		if (shaderProgram != null) {
 			shaderProgram.cleanup();
 		}
 	}
 	
-	public void runAssertions() {
-		System.out.println("ProgramID:" + shaderProgram.getProgramID());		
+	private void runAssertions() {
+			System.out.println("Name of the active program object: " + glGetInteger(GL_CURRENT_PROGRAM));		
 	}
 
 }

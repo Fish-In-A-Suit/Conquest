@@ -9,13 +9,16 @@ import renderEngine.Renderer;
 import renderEngine.Window;
 import utils.Timer;
 
+/**
+ * The starting point of the program - where all of the game comes together
+ * 
+ * @author Aljoša
+ *
+ */
 public class Main implements Runnable {
 	private boolean running = false;
 	private boolean assertions = true;
 	private Thread renderingThread;
-	
-	public static final int TARGET_FPS = 75;
-	public static final int TARGET_UPS = 30;
 
 	private Window window = new Window();
 	private Renderer renderer = new Renderer();
@@ -25,7 +28,6 @@ public class Main implements Runnable {
 	float[] positions = {
             -0.5f, 0.5f, 0f, //VO
             -0.5f, -0.5f, 0f, //V1
-            
             0.5f, -0.5f, 0f, //V2
             0.5f, 0.5f, 0f //V3
 	};
@@ -34,8 +36,16 @@ public class Main implements Runnable {
 		0, 1, 3, //top left triangle (V0, V1, V3)
 		3, 1, 2 //bottom right triangle (V3, V1, V2)
 	};
+	
+	float[] colours = {
+			0.5f, 0.5f, 0.0f,
+			0.4f, 0.3f, 0.2f,
+			0.8f, 0.6f, 0.8f,
+			0.2f, 0.3f, 0.4f
+	};
 
 	private void start() {
+		System.out.println("****************** STARTING CONQUEST ******************");
 		running = true;
 		renderingThread = new Thread(this, "renderingThread");
 		renderingThread.start();
@@ -51,11 +61,26 @@ public class Main implements Runnable {
 		gameLoop();
 	}
 	
+	/**
+	 * This method is responsible for intializing all of the components which are cruicial for the game to start, that is:
+	 *  - creating the window
+	 *  - set up a shader program
+	 *  - setting up the mesh
+	 *  
+	 * @throws Exception
+	 */
 	private void init() throws Exception {
+		System.out.println("[Main] Creating window... ");
 		window.init();
+		
+		System.out.println("[Main] Setting up renderer... ");
 		renderer.init();
+		
+		System.out.println("[Main] Starting timer... ");
 		timer.init();
-		setupMesh(positions, indices);
+		
+		System.out.println("Creating a new mesh object... ");
+		setupMesh(positions, indices, colours);
 	}
 	
 	private void gameLoop() {
@@ -66,12 +91,14 @@ public class Main implements Runnable {
 		int updates = 0;
 		int frames = 0;
 		
+		System.out.println("\n" + "[Main] Entering the main game loop!");
 		while(running) {
 			long now = System.nanoTime();
 			delta += (now - lastTime) / ns;
 			lastTime = now;
-					
+			
 			if (delta >= 1.0) {
+				processInput();
 				update();
 				updates ++;
 				delta--;
@@ -90,17 +117,25 @@ public class Main implements Runnable {
 			}
 					
 			if(glfwWindowShouldClose(window.windowHandle)) {
+				System.out.println("\n" + "****************** Starting cleanup operations ******************");
 				running = false;
+				
+				System.out.println("[Main] Cleaning up mesh...");
 				mesh.cleanUp();
+				
+				System.out.println("[Main] Freeing window callbacks...");
 				window.keycallback.free();
+				
+				System.out.println("[Main] Destroying window...");
 				glfwDestroyWindow(window.windowHandle);
+				
+				System.out.println("[Main] Terminating the glfw context...");
 				glfwTerminate();
 			}
 		}
 	}
 	
-	public void update() {
-		glfwSwapBuffers(window.windowHandle);
+	private void processInput() {
 		glfwPollEvents();
 		
 		if (window.keys[GLFW_KEY_SPACE] == true) {
@@ -108,21 +143,30 @@ public class Main implements Runnable {
 		}
 	}
 	
-	public void setupMesh(float[] vertices, int[] indices) {
-		mesh = new Mesh(vertices, indices);
+	public void update() {
+		glfwSwapBuffers(window.windowHandle);
+
+	}
+	
+	/**
+	 * This method creates a new instance of Mesh given the following parameters
+	 * @param vertices - the float array of vertex positions of a model
+	 * @param indices - the int array indices, which specify how OpenGL should connect the model's vertices
+	 * @param colours - the float array of associated vertex colours
+	 */
+	public void setupMesh(float[] vertices, int[] indices, float[] colours) {
+		mesh = new Mesh(vertices, indices, colours);
 	}
 
 	private void runAssertions()  {
 		if (mesh == null)  {
-			System.out.println("Mesh == null!");
+			System.out.println("[Main] Mesh hasn't been created!");
 		} else  {
-			System.out.println("Mesh exists");
+			System.out.println("[Main] Mesh exists");
 		}
 		
-		System.out.println("vaoID of mesh: " + mesh.getVaoID());
-		System.out.println("Width: " + window.getWidth() + ", Height: " + window.getHeight() );
-		
-		renderer.runAssertions();
+		System.out.println("[Main] vaoID of mesh: " + mesh.getVaoID());
+		System.out.println("[Main] Width of the window: " + window.getWidth() + ", Height of the window: " + window.getHeight() );
 	}
 	
 	public static void main(String[] args) {
