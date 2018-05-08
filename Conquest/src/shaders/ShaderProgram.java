@@ -6,13 +6,25 @@ import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL30.*;
 import static org.lwjgl.opengl.GL40.*;
 
+import java.nio.FloatBuffer;
+import java.util.HashMap;
+import java.util.Map;
+
+import math.Matrix4f;
+import utils.BufferUtilities;
+
 public class ShaderProgram {
 	private final int programID;
 	private int vertexShaderID;
 	private int fragmentShaderID;
 	
-	public ShaderProgram() throws Exception {
+	private final Map<String, Integer> uniforms;
+
+    public ShaderProgram() throws Exception {
 		programID = glCreateProgram();
+		
+		System.out.println("[ShaderProgram]: Creating new hashmap named uniforms...");
+		uniforms = new HashMap();
 
 		System.out.println("\n" + "[ShaderProgram] Starting ShaderProgram... ");
 		System.out.println("[ShaderProgram] programID: " + programID);
@@ -101,6 +113,38 @@ public class ShaderProgram {
 			System.out.println("Warning validating shader code: " + glGetShaderInfoLog(programID, 1024));
 		}
 	}
+	
+	/**
+	 * This defines the mapping between uniform locations and Java code and stores the obtained location in a HashMap (named uniforms).
+	 * It is invoked inside Renderer class, once the shader program has been compiled. Also make sure that the variable
+	 * has already been initialized before calling this method.
+	 * 
+	 * @param uniformName - the name of the uniform variable whose name is to be queried
+	 * @throws Exception 
+	 */
+	public void createUniform(String uniformName) throws Exception {
+		System.out.println("Finding a uniform location for: " + uniformName);
+		int uniformLocation = glGetUniformLocation(programID, uniformName);
+		System.out.println("The uniform location for " + uniformName + " is: " + uniformLocation);
+		
+		if (uniformLocation < 0) {
+			throw new Exception("[ShaderProgram.createUniform]: Couldn't find uniform: " + uniformName);
+		}
+		System.out.println("[ShaderProgram.createUniform]: Storing " + uniformName + " in " + uniforms);
+		uniforms.put(uniformName, uniformLocation);
+	}
+	
+	/**
+	 * This method sets the uniform values for 4x4 matrices. Use this method in the rendering method after the
+	 * program has been bound.
+	 * @param uniformName
+	 * @param value
+	 */
+	public void setUniformMatrix(String uniformName, Matrix4f inMatrix) {
+		FloatBuffer matrixBuffer = BufferUtilities.storeDataInFloatBuffer(inMatrix.mat4fToArray());
+		glUniformMatrix4fv(uniforms.get(uniformName), false, matrixBuffer);	
+	}
+	
 /*	
 	public void defineMappings() {
 		glBindAttribLocation(programID, 0, "position");

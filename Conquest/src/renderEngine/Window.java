@@ -8,6 +8,8 @@ import org.lwjgl.glfw.GLFWKeyCallback;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
 
+import math.Matrix4f;
+
 //import input.Input;
 
 /**
@@ -24,8 +26,9 @@ public class Window {
 	private String title = "Conquest" ;
 	
 	private boolean resized = false;
-	
 	public boolean[] keys = new boolean[35565];
+	
+	private Renderer renderer;
 
 	/**
 	 * This method creates the window with it's associated OpenGL context. It also:
@@ -58,7 +61,7 @@ public class Window {
 			this.setResized(true);
 		});
 		
-		glfwSetKeyCallback(windowHandle, keycallback = GLFWKeyCallback.create((window, key, scancode, action, mods) -> {
+		glfwSetKeyCallback(windowHandle, keycallback = GLFWKeyCallback.create((window, key, scancode, action, mods) -> {				
 			if (action != GLFW_RELEASE) {
 				keys[key] = true;
 			} else {

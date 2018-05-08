@@ -1,12 +1,15 @@
 package renderEngine;
 
 import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL20.*;
-import static org.lwjgl.opengl.GL30.*;
 
+import math.Matrix4f;
 import shaders.ShaderProgram;
 import utils.FileUtilities;
+import math.Transformations;
+import math.Vector3f;
+import math.Vector4f;
+import models.GameEntity;
 
 /**
  * This class deals with rendering to the window
@@ -16,8 +19,23 @@ import utils.FileUtilities;
 public class Renderer {
 	
 	private ShaderProgram shaderProgram;
+	private Window window = new Window();
+	
+	private final Transformations transformation;
+	
+	private Matrix4f translationMatrix = new Matrix4f();
+    private Matrix4f projectionMatrix = new Matrix4f();
+	
+	
+	private static double angleOfView = 60.0;
+	private static final float FOVY = (float) Math.toRadians(angleOfView);
+	private static final float zNear = 0.01f;
+	private static final float zFar = 1000.0f;
+	
+	//private Matrix4f projectionMatrix = transformation.getProjectionMatrix(FOVY, window.getWidth(), window.getHeight(), zNear, zFar);
 	
 	public Renderer() {
+		transformation = new Transformations();
 	}
 	
 	/**
@@ -39,6 +57,9 @@ public class Renderer {
 		
 		System.out.println("[Renderer] Linking shaderProgram... ");
 		shaderProgram.link();
+		
+		System.out.println("[Renderer]: Finding uniform variable locations...");
+		findUniformLocations();
 	}
 	
 	/**
@@ -56,7 +77,11 @@ public class Renderer {
 	 * @param window The window object
 	 * @param mesh An instance of Mesh class which we want to render 
 	 */
-	public void render(Window window, Mesh mesh) {
+	
+	int i = 0;
+	public void render(Window window, GameEntity[] entities) {
+		i++;
+		
 		clear();
 		
 		if (window.isResized()) {
@@ -65,18 +90,26 @@ public class Renderer {
 		}
 
 		shaderProgram.bind();
-
-		glBindVertexArray(mesh.getVaoID());
-		glEnableVertexAttribArray(0);
-		glEnableVertexAttribArray(1);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.getIndicesVboID());
-
-		glDrawElements(GL_TRIANGLES, mesh.getVertexCount(), GL_UNSIGNED_INT, 0);
 		
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-		glDisableVertexAttribArray(0);
-		glBindVertexArray(0);
+		//update projection matrix
+		Matrix4f projectionMatrix = transformation.getProjectionMatrix(FOVY, window.getWidth(), window.getHeight(), zNear, zFar);
+		shaderProgram.setUniformMatrix("projectionMatrix", projectionMatrix);
 		
+		if (i == 80) {
+			System.out.println("\nProjection matrix looks like: \n" + projectionMatrix.toString());
+			System.out.println("\nwindow width: " + window.getWidth() + " | window height: " + window.getHeight());
+			System.out.println("Entity position: " + entities[0].getPosition().toString());
+			projectionMatrix.displayPerspectiveMatProperties();
+			i = 0;
+		}
+		
+		//render each game item
+		for(GameEntity entity : entities) {
+			Matrix4f translationMat = transformation.getTranslationMatrix(entity.getPosition());
+			shaderProgram.setUniformMatrix("translationMatrix", translationMat);
+			entity.getMesh().render();
+		}
+
 		shaderProgram.unbind();
 	}
 	
@@ -92,5 +125,17 @@ public class Renderer {
 	private void runAssertions() {
 			System.out.println("Name of the active program object: " + glGetInteger(GL_CURRENT_PROGRAM));		
 	}
+	
+	/**
+	 * This method defines the location of the uniform variables in shader code.
+	 * @throws Exception
+	 */
+	private void findUniformLocations() throws Exception {
+		shaderProgram.createUniform("translationMatrix");
+		shaderProgram.createUniform("projectionMatrix");
+	}
+
+	
+	
 
 }

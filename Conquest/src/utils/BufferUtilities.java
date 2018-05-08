@@ -22,10 +22,11 @@ public class BufferUtilities {
 	 */
 	public static FloatBuffer storeDataInFloatBuffer(float[] array) {
 		FloatBuffer result = BufferUtils.createFloatBuffer(array.length);
+		//System.out.println("The state of the floatbuffer prior to populating it with data: " + result.toString());
 		result.put(array);
-		//System.out.println("State of the floatBuffer prior to being flipped: " + result.toString());
+		//System.out.println("The state of the floatbuffer after populating it with data: " + result.toString());
 		result.flip();
-		//System.out.println("State of the floatBuffer after being flipped: " + result.toString());
+		//System.out.println("The state of the floatbuffer after flipping it: " + result.toString());
 		return result;
 	}
 	
