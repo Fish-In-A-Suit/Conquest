@@ -82,3 +82,31 @@ The current program can now create a black window and respond to keyboard events
   - improved debugging info being printed to console
   - inside Main class, the input is now collected and responded to by a new method processInput(). That means that glfwPollEvents() has been removed from the update() method. Inside the game loop, processInput() is called prior to update().
   - changed the vertex shader to be a pass-through for colour --> now, it takes in an array of colour values for vertices and sends them off to the fragment shader (prior, it would just take position and assign colours based on position values +- 0.5)
+  
+## snapshot 0.7: Implemented the math library and put it to use
+**Main goal:** implement a a math package and define uniform variables. Use the matrices to move the quad around.
+
+**Description:**
+  A coloured squad (made of two triangles) is rendered onto the window. It can be moved using W, A, S, D, SPACE or LSHIFT. Depending on where it is moved, it will be projected correctly using a perspective projection matrix.
+
+- Video: https://www.youtube.com/watch?v=mqiH0ZSkM9I
+
+**Additions:**
+  - Added a private displayUpsAndFps(int ups, int fps) method inside Main class, which displays updates per second and frames per second near the window title
+  - Created a whole new Math package to handle math-related operations
+    - Added Matrix4f class. It represents a 4x4 matrix. It presents fucntionality to create translation and perspective projection matrices. Debugging methods for this class have also been added, which provide matrix-matrix and vector-matrix multiplication and a way to display matrices with a toString() method.
+    - Added Vector3f class. It represents a 3 dimensional vector.
+    - Added Vector4f class. It represents a 4 dimensional (homogenous) vector.
+    - Added a class called Transformations. It uses the functionality of the above classes to construct various kinds of transformation matrices. Translation and perspective projection transformations are currently supported.
+  - Added uniform variables to the vertex shader to send data such as matrices to shaders. Currently accepts a translation and projection matrix
+  - Created a new package called models, which handles all of the models of the game. 
+    - Created a GameEntity class. This class has references to a model's position, rotation, scale and state.
+  - Added a class called Game inside the main package, which provides all game logic and makes the computer game really look like a game. Currently it holds information such as an array of GameEntity object and meshes (in the future the mesh will be inseparately bound to a given GameEntity object). This class also provides functionality for collecting and responding to user input (keys W, A, S, D, SPACE and LSHIFT).
+
+**Changes:**
+  - Changed the utility to read files from Scanner to BufferedReader (section FileUtilities.loadResource), as Scanner was too slow to read them.
+  - Changed the rendering loop (renderEngine.Renderer.render) to handle the new additions. A for loop has been added to draw each entity in the array of GameEntities one by one.
+
+**Issues:**
+  - If the window is resized, the portion of the window on which rendering occurs isn't adjusted. Does it have to do with viewport of the window or the projection matrix?
+
