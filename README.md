@@ -110,3 +110,14 @@ The current program can now create a black window and respond to keyboard events
 **Issues:**
   - If the window is resized, the portion of the window on which rendering occurs isn't adjusted. Does it have to do with viewport of the window or the projection matrix?
 
+### Snapshot 0.7.1: Code cleanup and viewport issue fixed
+
+**Goal:** Code cleanup and improve the viewport issue
+
+**Additions:**
+  - added temporary class Quad to represent a Quadrant, which currently holds vertex positions, indices and colours of the quad.
+  - [Main.setWindowTitle]: extended this method to take a GameEntity and display its position in the title. This method is not perfect, however. The value of fps and ups should be set inside if (System.currentTimeMillis() - timer > 1000) clause in the main loop. The position of the game entity, however, should be set outside of this if statement inside the main loop. Because the entity position is displayed so slowly, its values don't change linearly (they hop, first 1, then 5, then 9 etc). It will do for now, however, since font rendering is implemented to display this information on the screen
+
+**Changes:**
+  - The viewport issue has been resolved. The Window.resized field was always false, since the isResized() method of Window class returned false. Always. Therefore the glViewport method inside Renderer.render couldn't be reached and the viewport was never resized. Fixed the isResized() method to return the value of field Window.resized and now everything works perfectly
+  - GameEntity is now improved. When passing vertex positions, indices and colours to its constructor, a brand new game entity is created from scratch based on the data provided. For example, a new GameEntity called entity is created in the constructor for Game class, which creates entity based on the data provided by a Quad instance (called quad). After that, all updates (changing position, rotation, etc) are performed on the instance of GameEntity
