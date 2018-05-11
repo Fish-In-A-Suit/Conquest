@@ -90,11 +90,11 @@ public class Matrix4f {
 		d_scale = scale;
 		float top = scale;
 		d_top = top;
-		float right = top * aspectRatio;
+		float right = scale * aspectRatio;
 		d_right = right;
 		float bottom = -top;
 		d_bottom = bottom;
-		float left = bottom * aspectRatio;
+		float left = -scale * aspectRatio;
 		d_left = left;
 		
 		this.m00 = 2*zNear / (right - left);

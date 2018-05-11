@@ -4,6 +4,7 @@ import static org.lwjgl.glfw.GLFW.*;
 
 import models.GameEntity;
 import models.Mesh;
+import models.Quad;
 import renderEngine.Window;
 
 /**
@@ -12,7 +13,7 @@ import renderEngine.Window;
  *
  */
 public class Game {
-	private Main main = new Main();
+	private Quad quad = new Quad();
 	private GameEntity[] entities;
 	private Mesh mesh;
 	
@@ -22,9 +23,13 @@ public class Game {
 	 * Creates a new array of GameEntities and stores entity in that array.
 	 */
 	public Game() {
-		mesh = new Mesh(main.positions, main.indices, main.colours);
-		GameEntity entity = new GameEntity(mesh);
-		entity.updatePosition(0, 0, -2);
+		System.out.println("[Game.Game]: Creating a new GameEntity based on data provided by quad...");
+		GameEntity entity = new GameEntity(quad.positions, quad.indices, quad.colours);
+		
+		System.out.println("[Game.Game]: Updating entity position...");
+		entity.updatePosition(0, 0, 0);
+		
+		System.out.println("[Game.Game]: Adding entity inside array entities...");
 		entities = new GameEntity[] { entity };
 	}
 
@@ -44,11 +49,11 @@ public class Game {
 		} 
 		
 	}
-	
+/*	
 	public void setupMesh(float[] vertices, int[] indices, float[] colours) {
 		mesh = new Mesh(vertices, indices, colours);
 	}
-	
+*/	
 	public GameEntity[] getGameEntities() {
 		return entities;
 	}

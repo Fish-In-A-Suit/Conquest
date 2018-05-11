@@ -57,19 +57,6 @@ public class Mesh {
 			glBindVertexArray(0);
 	}
 	
-	public void render() {
-		glBindVertexArray(getVaoID());
-		glEnableVertexAttribArray(0);
-		glEnableVertexAttribArray(1);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, getIndicesVboID());
-
-		glDrawElements(GL_TRIANGLES, getVertexCount(), GL_UNSIGNED_INT, 0);
-		
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-		glDisableVertexAttribArray(0);
-		glBindVertexArray(0);
-	}
-	
 	/**
 	 * This methods loads up the indices buffer and binds it to the vao
 	 * 
@@ -90,6 +77,91 @@ public class Mesh {
 		
 		System.out.println("   - [Mesh] Buffering data from indicesBuffer to GL_ELEMENT_ARRAY_TARGET...");
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, indicesBuffer, GL_STATIC_DRAW);
+	}
+	
+	/**
+	 * This is a debugging method for checking the contents of the verticesBuffer
+	 * 
+	 * @param vertices
+	 */
+	public void checkVertices(float vertices[]) {
+		int i = 0;
+		System.out.print("      - [Mesh] The contents of vertices array: ");
+		
+		for (float vertex : vertices) {
+			System.out.print("[" + ++i + "]" + verticesBuffer.get((int)vertex) + ", ");
+		}	
+
+		System.out.println("\n" + "      - [Mesh] Number of vertices: " + vertexCount);	
+		
+		System.out.println("      - [Mesh] State of verticesBuffer after putting data in but prior to flipping it: " + 
+		                   verticesBuffer.toString());
+	
+		if(verticesBuffer.hasArray()) {
+			System.out.println("      - [Mesh] verticesBuffer is backed by an accessible float array");
+		} else {
+			System.out.println("      - [Mesh] verticesBuffer isn't backed by an accessible float array!");
+		}
+	}
+	
+	/**
+	 * Removes the mesh instance from memory
+	 */
+	public void cleanUp() {
+		System.out.println("[Mesh] cleaning up the mesh object");
+		glDisableVertexAttribArray(0);
+		
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glDeleteBuffers(verticesVboID);
+		
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+		glDeleteBuffers(indicesVboID);
+		
+		glBindVertexArray(0);
+		glDeleteVertexArrays(vaoID);
+	}
+	
+	/**
+	 * @return  indicesVboID - the int reference to the  buffer object which stores the indices of a particular
+	 * mesh instance
+	 */
+	public int getIndicesVboID() {
+		return indicesVboID;
+	}
+	
+	/**
+	 * @return vaoID - the int reference to the vertex array object associated with a particular instance of Mesh
+	 */
+	public int getVaoID() {
+		return vaoID;
+	}
+	
+	/**
+	 * @return vertexCount - the amount of vertices of a particular instance of Mesh
+	 */
+	public int getVertexCount() {
+		return vertexCount;
+	}
+	
+	/**
+	 * @return verticesVboID - the int reference to the buffer object which stores the vertices of a
+	 * particular mesh instance
+	 */
+	public int getVerticesVboID() {
+		return verticesVboID;
+	}
+	
+	public void render() {
+		glBindVertexArray(getVaoID());
+		glEnableVertexAttribArray(0);
+		glEnableVertexAttribArray(1);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, getIndicesVboID());
+
+		glDrawElements(GL_TRIANGLES, getVertexCount(), GL_UNSIGNED_INT, 0);
+		
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+		glDisableVertexAttribArray(0);
+		glBindVertexArray(0);
 	}
 	
 	/**
@@ -140,78 +212,6 @@ public class Mesh {
 		
 		System.out.println("   - [Mesh] Sending verticesVboID to attribute list index 0 of the active vao...");
 		glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0);
-	}
-	
-	/**
-	 * @return vaoID - the int reference to the vertex array object associated with a particular instance of Mesh
-	 */
-	public int getVaoID() {
-		return vaoID;
-	}
-	
-	/**
-	 * @return vertexCount - the amount of vertices of a particular instance of Mesh
-	 */
-	public int getVertexCount() {
-		return vertexCount;
-	}
-	
-	/**
-	 * @return verticesVboID - the int reference to the buffer object which stores the vertices of a
-	 * particular mesh instance
-	 */
-	public int getVerticesVboID() {
-		return verticesVboID;
-	}
-	
-	/**
-	 * @return  indicesVboID - the int reference to the  buffer object which stores the indices of a particular
-	 * mesh instance
-	 */
-	public int getIndicesVboID() {
-		return indicesVboID;
-	}
-	
-	/**
-	 * This is a debugging method for checking the contents of the verticesBuffer
-	 * 
-	 * @param vertices
-	 */
-	public void checkVertices(float vertices[]) {
-		int i = 0;
-		System.out.print("      - [Mesh] The contents of vertices array: ");
-		
-		for (float vertex : vertices) {
-			System.out.print("[" + ++i + "]" + verticesBuffer.get((int)vertex) + ", ");
-		}	
-
-		System.out.println("\n" + "      - [Mesh] Number of vertices: " + vertexCount);	
-		
-		System.out.println("      - [Mesh] State of verticesBuffer after putting data in but prior to flipping it: " + 
-		                   verticesBuffer.toString());
-	
-		if(verticesBuffer.hasArray()) {
-			System.out.println("      - [Mesh] verticesBuffer is backed by an accessible float array");
-		} else {
-			System.out.println("      - [Mesh] verticesBuffer isn't backed by an accessible float array!");
-		}
-	}
-	
-	/**
-	 * Removes the mesh instance from memory
-	 */
-	public void cleanUp() {
-		System.out.println("[Mesh] cleaning up the mesh object");
-		glDisableVertexAttribArray(0);
-		
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-		glDeleteBuffers(verticesVboID);
-		
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-		glDeleteBuffers(indicesVboID);
-		
-		glBindVertexArray(0);
-		glDeleteVertexArrays(vaoID);
 	}
 
 }

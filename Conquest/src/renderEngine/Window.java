@@ -8,10 +8,6 @@ import org.lwjgl.glfw.GLFWKeyCallback;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
 
-import math.Matrix4f;
-
-//import input.Input;
-
 /**
  * This class provides functionality for creating a glfw window and it's associated context
  * @author Aljoša
@@ -23,12 +19,11 @@ public class Window {
 	
 	private int width = 1920;
 	private int height = 1080;
+
 	private String title = "Conquest" ;
 	
 	private boolean resized = false;
 	public boolean[] keys = new boolean[35565];
-	
-	private Renderer renderer;
 
 	/**
 	 * This method creates the window with it's associated OpenGL context. It also:
@@ -56,9 +51,10 @@ public class Window {
 		}
 		
 		glfwSetFramebufferSizeCallback(windowHandle, (window, width, height) -> {
-			this.width = width;
+		    this.width = width;
 			this.height = height;
-			this.setResized(true);
+			resized = true;
+			System.out.println("Window has been resized! New width and height are: " + width + " | " + height);
 		});
 		
 		glfwSetKeyCallback(windowHandle, keycallback = GLFWKeyCallback.create((window, key, scancode, action, mods) -> {				
@@ -89,7 +85,7 @@ public class Window {
 	}
 	
 	public boolean isResized() {
-		return false;
+		return resized;
 	}
 
 	public int getWidth() {

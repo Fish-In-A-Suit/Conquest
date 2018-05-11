@@ -15,8 +15,11 @@ public class GameEntity {
 	private float scale;
 	private Vector3f rotation;
 	
-	public GameEntity(Mesh mesh) {
-		this.mesh = mesh;
+	public GameEntity(float[] vPositions, int[] indices, float[] colours) {
+		System.out.println("[GameEntity.GameEntity]: Initializing mesh instance field based on parameters... ");
+		mesh = new Mesh(vPositions, indices, colours);
+		
+		System.out.println("[GameEntity.GameEntity]: Initializing position, scale and rotation instance fields... ");
 		position = new Vector3f(0, 0, 0);
 		scale = 1;
 		rotation = new Vector3f(0, 0, 0);

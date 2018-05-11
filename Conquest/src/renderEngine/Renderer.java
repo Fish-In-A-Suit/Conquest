@@ -1,14 +1,11 @@
 package renderEngine;
 
 import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL20.*;
 
 import math.Matrix4f;
 import shaders.ShaderProgram;
 import utils.FileUtilities;
 import math.Transformations;
-import math.Vector3f;
-import math.Vector4f;
 import models.GameEntity;
 
 /**
@@ -19,13 +16,8 @@ import models.GameEntity;
 public class Renderer {
 	
 	private ShaderProgram shaderProgram;
-	private Window window = new Window();
 	
 	private final Transformations transformation;
-	
-	private Matrix4f translationMatrix = new Matrix4f();
-    private Matrix4f projectionMatrix = new Matrix4f();
-	
 	
 	private static double angleOfView = 60.0;
 	private static final float FOVY = (float) Math.toRadians(angleOfView);
@@ -53,13 +45,11 @@ public class Renderer {
 		System.out.println("[Renderer] Creating fragment shader... ");
 		shaderProgram.createFragmentShader(FileUtilities.loadResource("/shaders/fragmentShader.fs"));
 		
-		//shaderProgram.defineMappings();
-		
 		System.out.println("[Renderer] Linking shaderProgram... ");
 		shaderProgram.link();
 		
 		System.out.println("[Renderer]: Finding uniform variable locations...");
-		findUniformLocations();
+		defineUniformLocations();
 	}
 	
 	/**
@@ -96,10 +86,10 @@ public class Renderer {
 		shaderProgram.setUniformMatrix("projectionMatrix", projectionMatrix);
 		
 		if (i == 80) {
-			System.out.println("\nProjection matrix looks like: \n" + projectionMatrix.toString());
+			//System.out.println("\nProjection matrix looks like: \n" + projectionMatrix.toString());
 			System.out.println("\nwindow width: " + window.getWidth() + " | window height: " + window.getHeight());
 			System.out.println("Entity position: " + entities[0].getPosition().toString());
-			projectionMatrix.displayPerspectiveMatProperties();
+			//projectionMatrix.displayPerspectiveMatProperties();
 			i = 0;
 		}
 		
@@ -117,20 +107,18 @@ public class Renderer {
 	 * This method removes the active shader program from memory
 	 */
 	public void cleanup() {
+		System.out.println("[Renderer.cleanup]: Cleaning up shader program...");
 		if (shaderProgram != null) {
 			shaderProgram.cleanup();
 		}
-	}
-	
-	private void runAssertions() {
-			System.out.println("Name of the active program object: " + glGetInteger(GL_CURRENT_PROGRAM));		
 	}
 	
 	/**
 	 * This method defines the location of the uniform variables in shader code.
 	 * @throws Exception
 	 */
-	private void findUniformLocations() throws Exception {
+	private void defineUniformLocations() throws Exception {
+		System.out.println("[Renderer.defineUniformLocations]: Finding locations of the uniform variables... ");
 		shaderProgram.createUniform("translationMatrix");
 		shaderProgram.createUniform("projectionMatrix");
 	}
