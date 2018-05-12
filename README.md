@@ -121,3 +121,16 @@ The current program can now create a black window and respond to keyboard events
 **Changes:**
   - The viewport issue has been resolved. The Window.resized field was always false, since the isResized() method of Window class returned false. Always. Therefore the glViewport method inside Renderer.render couldn't be reached and the viewport was never resized. Fixed the isResized() method to return the value of field Window.resized and now everything works perfectly
   - GameEntity is now improved. When passing vertex positions, indices and colours to its constructor, a brand new game entity is created from scratch based on the data provided. For example, a new GameEntity called entity is created in the constructor for Game class, which creates entity based on the data provided by a Quad instance (called quad). After that, all updates (changing position, rotation, etc) are performed on the instance of GameEntity
+  
+### Snapshot 0.7.2: Implement the rotation matrix
+
+**Goal:** Implement the rotation matrix and make the triangle rotate
+
+**Additions:**
+  - Added rotateX(double angle), rotateY(double angle), rotateZ(double angle) and rotate(double rotx, double roty, double rotz) methods inside Matrix4f class. Each of the first three methods creates a corresponding rotation matrix, while the last (general) roation method uses the first three methods to create a rotation matrix which is a combination of rotations in all axes
+  - Added getRotationMatrix(float rotx, float roty, float rotz) method to Transformations class, which uses the rotate method of Matrix4f class to create and return a rotation matrix
+  - Added rotationMatrix uniform variable and defined the mapping to it from the Java code (more precisely from the Renderer class)
+  - Pressing Y rotates the model around the y axis, pressing X rotates the model around the x axis and pressing Z rotates the model around the z axis. Pressing I rotates the model in all three axes simultaneously
+
+**Issues:**
+  - I believe the rotation around the x axis isn't working. Something has to be wrong with matrix multiplication or the like
