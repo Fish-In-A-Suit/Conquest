@@ -5,6 +5,7 @@ import math.Vector3f;
 
 public class Transformations {
 	private Matrix4f translationMatrix;
+	private Matrix4f rotationMatrix;
 	private static Matrix4f projectionMatrix;
 	
 	public float dAspect;
@@ -38,6 +39,18 @@ public class Transformations {
 	public Matrix4f getTranslationMatrix(Vector3f vec) {
 		translationMatrix.translate(vec);
 		return translationMatrix;
+	}
+	
+	/**
+	 * Creates and returns a rotation matrix
+	 * @param rotx The angle by which to rotate around the x axis
+	 * @param roty The angle by which to rotate around the y axis
+	 * @param rotz The angle by which to rotate around the z axis
+	 * @return
+	 */
+	public Matrix4f getRotationMatrix(float rotx, float roty, float rotz) {
+		rotationMatrix = new Matrix4f().rotate(rotx, roty, rotz);
+		return rotationMatrix;
 	}
 	
     /**

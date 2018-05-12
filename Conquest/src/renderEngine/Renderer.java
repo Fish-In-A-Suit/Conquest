@@ -97,6 +97,8 @@ public class Renderer {
 		for(GameEntity entity : entities) {
 			Matrix4f translationMat = transformation.getTranslationMatrix(entity.getPosition());
 			shaderProgram.setUniformMatrix("translationMatrix", translationMat);
+			Matrix4f rotationMat = transformation.getRotationMatrix(entity.getRotation().x, entity.getRotation().y, entity.getRotation().z);
+			shaderProgram.setUniformMatrix("rotationMatrix", rotationMat);
 			entity.getMesh().render();
 		}
 
@@ -120,6 +122,7 @@ public class Renderer {
 	private void defineUniformLocations() throws Exception {
 		System.out.println("[Renderer.defineUniformLocations]: Finding locations of the uniform variables... ");
 		shaderProgram.createUniform("translationMatrix");
+		shaderProgram.createUniform("rotationMatrix");
 		shaderProgram.createUniform("projectionMatrix");
 	}
 

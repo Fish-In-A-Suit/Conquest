@@ -126,4 +126,61 @@ public class Matrix4f {
 		this.m23 = vec.z;
 		return this;
 	}
+	
+	/**
+	 * Rotates a Matrix4f around the x axis by the specified angle
+	 * @param angle
+	 * @return
+	 */
+	public Matrix4f rotateX(double angle) {
+		this.m11 = (float) Math.cos(angle);
+		this.m12 = - (float) Math.sin(angle);
+		this.m21 = (float) Math.sin(angle);
+		this.m22 = (float) Math.cos(angle);
+		return this;
+	}
+	
+	/**
+	 * Rotates a Matrix4f around the y axis by the specified angle
+	 * @param angle
+	 * @return
+	 */
+	public Matrix4f rotateY(double angle) {
+		this.m00 = (float) Math.cos(angle);
+		this.m02 = (float) Math.sin(angle);
+		this.m20 = - (float) Math.sin(angle);
+		this.m22 = (float) Math.cos(angle);
+		return this;
+	}
+	
+	/**
+	 * Rotates a Matrix4f around the z axis by the specified angle
+	 * @param angle
+	 * @return
+	 */
+	public Matrix4f rotateZ(double angle) {
+		this.m00 = (float) Math.cos(angle);
+		this.m01 = - (float) Math.sin(angle);
+		this.m10 = (float) Math.sin(angle);
+		this.m11 = (float) Math.cos(angle);
+		return this;
+	}
+	
+	/**
+	 * Rotates a Matrix4f around the x, y and z axes by the specified angles
+	 * @param rotx
+	 * @param roty
+	 * @param rotz
+	 * @return
+	 */
+	public Matrix4f rotate(double rotx, double roty, double rotz) {
+		//return this.rotateY(roty).multiplyByMatrix(this.rotateX(rotx)).multiplyByMatrix(this.rotateZ(rotz));
+
+		Matrix4f rotateX = new Matrix4f().rotateX(rotx);
+		Matrix4f rotateY = new Matrix4f().rotateY(roty);
+		Matrix4f rotateZ = new Matrix4f().rotateZ(rotz);
+		Matrix4f result = rotateY.multiplyByMatrix(rotateZ).multiplyByMatrix(rotateX);
+		return result;
+
+	}
 }
