@@ -19,6 +19,8 @@ public class Renderer {
 	
 	private final Transformations transformation;
 	
+	private Matrix4f rotationMat;
+	
 	private static double angleOfView = 60.0;
 	private static final float FOVY = (float) Math.toRadians(angleOfView);
 	private static final float zNear = 0.01f;
@@ -89,6 +91,8 @@ public class Renderer {
 			//System.out.println("\nProjection matrix looks like: \n" + projectionMatrix.toString());
 			System.out.println("\nwindow width: " + window.getWidth() + " | window height: " + window.getHeight());
 			System.out.println("Entity position: " + entities[0].getPosition().toString());
+			System.out.println("Entity rotation: " + entities[0].getRotation().displayFriendly());
+			System.out.println("Rotation matrix looks like: \n" + rotationMat.toString());
 			//projectionMatrix.displayPerspectiveMatProperties();
 			i = 0;
 		}
@@ -97,7 +101,9 @@ public class Renderer {
 		for(GameEntity entity : entities) {
 			Matrix4f translationMat = transformation.getTranslationMatrix(entity.getPosition());
 			shaderProgram.setUniformMatrix("translationMatrix", translationMat);
-			Matrix4f rotationMat = transformation.getRotationMatrix(entity.getRotation().x, entity.getRotation().y, entity.getRotation().z);
+			rotationMat = transformation.getRotationMatrix(entity.getRotation().x, entity.getRotation().y, entity.getRotation().z);
+			//entity.increaseRotation(0.035f, 0.035f, 0.035f);
+			//rotationMat = transformation.getRotationMatrix(entity.getRotation().x, entity.getRotation().y, entity.getRotation().z);
 			shaderProgram.setUniformMatrix("rotationMatrix", rotationMat);
 			entity.getMesh().render();
 		}

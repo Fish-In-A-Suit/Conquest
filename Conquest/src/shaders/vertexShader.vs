@@ -9,9 +9,11 @@ uniform mat4 translationMatrix;
 uniform mat4 rotationMatrix;
 uniform mat4 projectionMatrix;
 
+mat4 modelMatrix = rotationMatrix*translationMatrix;
+
 void main()
 {
-	gl_Position = vec4(inVertexPosition, 1.0) * translationMatrix * rotationMatrix * projectionMatrix;
-
+	//gl_Position = vec4(inVertexPosition, 1.0) * rotationMatrix * translationMatrix * projectionMatrix;
+    gl_Position = vec4(inVertexPosition, 1.0) * modelMatrix * projectionMatrix;
     outVertexColour = inVertexColour;
 }

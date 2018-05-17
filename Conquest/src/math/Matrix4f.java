@@ -62,7 +62,7 @@ public class Matrix4f {
 		this.m10 += mat.m01; this.m11 += mat.m11; this.m12 += mat.m21; this.m13 += mat.m31;
 		this.m20 += mat.m02; this.m21 += mat.m12; this.m22 += mat.m22; this.m23 += mat.m32;
 		this.m30 += mat.m03; this.m31 += mat.m13; this.m32 += mat.m23; this.m33 += mat.m33;
-		return this;
+		return this;	
 	}
 	
 	/**
@@ -132,6 +132,7 @@ public class Matrix4f {
 	 * @param angle
 	 * @return
 	 */
+	// this is wrong
 	public Matrix4f rotateX(double angle) {
 		this.m11 = (float) Math.cos(angle);
 		this.m12 = - (float) Math.sin(angle);
@@ -145,6 +146,7 @@ public class Matrix4f {
 	 * @param angle
 	 * @return
 	 */
+	//this is wrong
 	public Matrix4f rotateY(double angle) {
 		this.m00 = (float) Math.cos(angle);
 		this.m02 = (float) Math.sin(angle);
@@ -158,11 +160,22 @@ public class Matrix4f {
 	 * @param angle
 	 * @return
 	 */
+	//this is wrong
 	public Matrix4f rotateZ(double angle) {
-		this.m00 = (float) Math.cos(angle);
-		this.m01 = - (float) Math.sin(angle);
-		this.m10 = (float) Math.sin(angle);
-		this.m11 = (float) Math.cos(angle);
+		float cosZ = (float) Math.cos(angle);
+		float sinZ = (float) Math.sin(angle);
+		
+		this.m00 = cosZ;
+		this.m01 = - sinZ;
+		this.m10 = sinZ;
+		this.m11 = cosZ;
+		
+		/*
+		this.m00 = c;
+		this.m01 = - s;
+		this.m10 = s;
+		this.m11 = c;
+		*/
 		return this;
 	}
 	
@@ -173,6 +186,7 @@ public class Matrix4f {
 	 * @param rotz
 	 * @return
 	 */
+	//this is wrong
 	public Matrix4f rotate(double rotx, double roty, double rotz) {
 		//return this.rotateY(roty).multiplyByMatrix(this.rotateX(rotx)).multiplyByMatrix(this.rotateZ(rotz));
 
@@ -181,6 +195,53 @@ public class Matrix4f {
 		Matrix4f rotateZ = new Matrix4f().rotateZ(rotz);
 		Matrix4f result = rotateY.multiplyByMatrix(rotateZ).multiplyByMatrix(rotateX);
 		return result;
-
+	}
+	
+	public Matrix4f rotateXZY(float rx, float ry, float rz, Matrix4f dest) {
+		float sinX = (float) Math.sin(rx);
+		float cosX = (float) Math.cos(rx);
+		float sinY = (float) Math.sin(ry);
+		float cosY = (float) Math.cos(ry);
+		float sinZ = (float) Math.sin(rz);
+		float cosZ = (float) Math.cos(rz);
+		float mSinX = -sinX;
+		float mSinY = -sinY;
+		float mSinZ = -sinZ;
+		
+		//rotate x
+		float nm10 = m10 * cosX + m20 * sinX;
+        float nm11 = m11 * cosX + m21 * sinX;
+        float nm12 = m12 * cosX + m22 * sinX;
+        float nm13 = m13 * cosX + m23 * sinX;
+        float nm20 = m10 * mSinX + m20 * cosX;
+        float nm21 = m11 * mSinX + m21 * cosX;
+        float nm22 = m12 * mSinX + m22 * cosX;
+        float nm23 = m13 * mSinX + m23 * cosX;
+        //rotateY
+        float nm00 = m00 * cosY + nm20 * mSinY;
+        float nm01 = m01 * cosY + nm21 * mSinY;
+        float nm02 = m02 * cosY + nm22 * mSinY;
+        float nm03 = m03 * cosY + nm23 * mSinY;
+        dest.m20 = m00 * sinY + nm20 * cosY;
+        dest.m21 = m01 * sinY + nm21 * cosY;
+        dest.m22 = m02 * sinY + nm22 * cosY;
+        dest.m23 = m03 * sinY + nm23 * cosY;
+        //rotateZ
+        dest.m00 = nm00 * cosZ + nm10 * sinZ;
+        dest.m01 = nm01 * cosZ + nm11 * sinZ;
+        dest.m02 = nm02 * cosZ + nm12 * sinZ;
+        dest.m03 = nm03 * cosZ + nm13 * sinZ;
+        dest.m10 = nm00 * mSinZ + nm10 * cosZ;
+        dest.m11 = nm01 * mSinZ + nm11 * cosZ;
+        dest.m12 = nm02 * mSinZ + nm12 * cosZ;
+        dest.m13 = nm03 * mSinZ + nm13 * cosZ;
+        
+        //copy last column from this
+        dest.m30 = m30;
+        dest.m31 = m31;
+        dest.m32 = m32;
+        dest.m33 = m33;
+        
+        return dest;
 	}
 }

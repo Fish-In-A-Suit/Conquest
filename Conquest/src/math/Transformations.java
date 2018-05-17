@@ -13,6 +13,7 @@ public class Transformations {
 	public Transformations() {
 		System.out.println("[Transformation.Transformations()]: Creating translation matrix... ");
 		translationMatrix = new Matrix4f();
+		rotationMatrix = new Matrix4f();
 		projectionMatrix = new Matrix4f();
 	}
 
@@ -49,7 +50,9 @@ public class Transformations {
 	 * @return
 	 */
 	public Matrix4f getRotationMatrix(float rotx, float roty, float rotz) {
-		rotationMatrix = new Matrix4f().rotate(rotx, roty, rotz);
+		//rotationMatrix = new Matrix4f().rotate(rotx, roty, rotz);
+		Matrix4f dest = new Matrix4f();
+		rotationMatrix = new Matrix4f().rotateXZY(rotx, roty, rotz, dest);
 		return rotationMatrix;
 	}
 	
