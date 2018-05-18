@@ -134,3 +134,21 @@ The current program can now create a black window and respond to keyboard events
 
 **Issues:**
   - I believe the rotation around the x axis isn't working. Something has to be wrong with matrix multiplication or the like
+  
+ ### Snapshot 0.7.3: Fixed rotation around X, Y and Z axes
+
+**Changes**:
+  - Changed the way how rotation matrix works. I've created a new method (rotateXYZ) which performs correct rotation. I've left the old methods for rotation in place, which will be fixed in some future update.
+
+### snapshot 0. 7. 4: implemented scaling transformation
+
+**Goal:** Fix the method for matrix-matrix multiplication and implemnent the scaling matrix
+
+**Additions:**
+  - Added a getModelMatrix(Matrix4f translation, Matrix4f rotation) method, which creates the model/world matrix (the matrix which transforms model's vertices from the model's position to the world). Currently, only translation and rotation transformations apply, scaling will be added shortly.
+  - Implemented scaling effects, which can be achieved by calling transformation.getScaleMatrix(float scale) method. This method is put to use inside the Renderer.render method, where the scale of the entity is updated once per render call. The result obtained by transformation.getScaleMatrix(entity.getScale()) is then used to create the model matrix (along with translation and rotation), which is then sent to the vertex shader.
+
+**Changes:**
+  - Fixed the method multiplyByMatrix(Matrix4f mat) in class Matrix4f to produce correct results.
+  - The vertexShader now only takes in mat4 modelMatrix as a parameter instead of three mat4s for translation, rotation and scale, so as to save up on some gpu power. The model matrix is calculated on the processor.
+ 
