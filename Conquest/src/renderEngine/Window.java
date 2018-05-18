@@ -8,28 +8,31 @@ import org.lwjgl.glfw.GLFWKeyCallback;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
 
-//import input.Input;
-
+/**
+ * This class provides functionality for creating a glfw window and it's associated context
+ * @author Aljoša
+ *
+ */
 public class Window {
 	public long windowHandle;
 	public GLFWKeyCallback keycallback;
 	
 	private int width = 1920;
 	private int height = 1080;
+
 	private String title = "Conquest" ;
 	
 	private boolean resized = false;
-	
 	public boolean[] keys = new boolean[35565];
 
 	/**
 	 * This method creates the window with it's associated OpenGL context. It also:
 	 *   - sets up a size callback
 	 *   - sets up a key callback
-	 *   - positions the window to the contre of the screen
+	 *   - positions the window to the centre of the screen
 	 */
 	public void init() {
-		if(!glfwInit()) {
+		if(glfwInit() == false) {
 			throw new IllegalStateException("Unable to initialize GLFW!");
 		}
 		
@@ -48,12 +51,13 @@ public class Window {
 		}
 		
 		glfwSetFramebufferSizeCallback(windowHandle, (window, width, height) -> {
-			this.width = width;
+		    this.width = width;
 			this.height = height;
-			this.setResized(true);
+			resized = true;
+			System.out.println("Window has been resized! New width and height are: " + width + " | " + height);
 		});
 		
-		glfwSetKeyCallback(windowHandle, keycallback = GLFWKeyCallback.create((window, key, scancode, action, mods) -> {
+		glfwSetKeyCallback(windowHandle, keycallback = GLFWKeyCallback.create((window, key, scancode, action, mods) -> {				
 			if (action != GLFW_RELEASE) {
 				keys[key] = true;
 			} else {
@@ -73,7 +77,7 @@ public class Window {
 		
 		glEnable(GL_DEPTH_TEST);
 		
-		System.out.println("OpenGL version: " + glGetString(GL_VERSION));
+		System.out.println("[Window] OpenGL version: " + glGetString(GL_VERSION));
 	}
 	
 	public void setResized(boolean resized) {
@@ -81,7 +85,7 @@ public class Window {
 	}
 	
 	public boolean isResized() {
-		return false;
+		return resized;
 	}
 
 	public int getWidth() {
