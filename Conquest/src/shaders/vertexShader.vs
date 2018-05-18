@@ -5,11 +5,8 @@ layout (location = 1) in vec3 inVertexColour;
 
 out vec3 outVertexColour;
 
-uniform mat4 translationMatrix;
-uniform mat4 rotationMatrix;
 uniform mat4 projectionMatrix;
-
-mat4 modelMatrix = rotationMatrix*translationMatrix;
+uniform mat4 modelMatrix;
 
 void main()
 {

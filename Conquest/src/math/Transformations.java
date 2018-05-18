@@ -6,7 +6,9 @@ import math.Vector3f;
 public class Transformations {
 	private Matrix4f translationMatrix;
 	private Matrix4f rotationMatrix;
+	private Matrix4f scaleMatrix;
 	private static Matrix4f projectionMatrix;
+	private Matrix4f modelMatrix;
 	
 	public float dAspect;
 	
@@ -14,7 +16,9 @@ public class Transformations {
 		System.out.println("[Transformation.Transformations()]: Creating translation matrix... ");
 		translationMatrix = new Matrix4f();
 		rotationMatrix = new Matrix4f();
+		scaleMatrix = new Matrix4f();
 		projectionMatrix = new Matrix4f();
+		modelMatrix = new Matrix4f();
 	}
 
 	/**
@@ -70,5 +74,26 @@ public class Transformations {
 		float aspectRatio = (float) width / height;
 		projectionMatrix.perspective(fovy, aspectRatio, zNear, zFar);
 		return projectionMatrix;
+	}
+	
+	/**
+	 * Returns the model/world matrix by a given translation, rotation and scale
+	 * @param translation The translation matrix
+	 * @param rotation The rotation matrix
+	 * @return
+	 */
+	public Matrix4f getModelMatrix(Matrix4f translation, Matrix4f rotation, Matrix4f scale) {
+		//wrong!!! modelMatrix = scale.multiplyByMatrix(rotation).multiplyByMatrix(translation);
+		modelMatrix = translation.multiplyByMatrix(rotation).multiplyByMatrix(scale);
+		return modelMatrix;
+	}
+	
+	/**
+	 * Creates a scaling matrix out of the defined parameter
+	 * @param scale
+	 * @return
+	 */
+	public Matrix4f getScaleMatrix(float scale) {
+		return scaleMatrix.scale(scale);
 	}
 }

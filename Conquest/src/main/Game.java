@@ -48,13 +48,19 @@ public class Game {
 		} else if (window.keys[GLFW_KEY_LEFT_SHIFT]) {
 			entities[0].updatePosition(0, -1.0f, 0);
 		} else if (window.keys[GLFW_KEY_X]) {
-			entities[0].increaseRotation(0.1f, 0f, 0f);
+			entities[0].increaseRotation(2.0f, 0f, 0f);
 		} else if (window.keys[GLFW_KEY_Y]) {
-			entities[0].increaseRotation(0f, 0.1f, 0f);
+			entities[0].increaseRotation(0f, 2.0f, 0f);
 		} else if (window.keys[GLFW_KEY_Z]) {
-			entities[0].increaseRotation(0f, 0f, 0.1f);
+			entities[0].increaseRotation(0f, 0f, 2.0f);
 		} else if (window.keys[GLFW_KEY_I]) {
-			entities[0].increaseRotation(0.08f, 0.08f, 0.08f);
+			entities[0].increaseRotation(1.0f, 1.0f, 1.0f);
+		} else if (window.keys[GLFW_KEY_J]) {
+			entities[0].increaseScale(1.0f);
+		} else if (window.keys[GLFW_KEY_K]) {
+			entities[0].increaseScale(-1.0f);
+		} else if (window.keys[GLFW_KEY_F]) {
+			entities[0].increaseAllFun(1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f);
 		}
 		
 	}

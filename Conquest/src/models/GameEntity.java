@@ -42,9 +42,13 @@ public class GameEntity {
 	}
 	
 	public void increaseRotation(float x, float y, float z) {
-		rotation.x += x;
-		rotation.y += y;
-		rotation.z += z;
+		rotation.x += x * 0.05f;
+		rotation.y += y * 0.05f;
+		rotation.z += z * 0.05f;
+	}
+	
+	public void increaseScale(float scale) {
+		this.scale += scale * 0.01f;
 	}
  
 	public float getScale() {
@@ -67,5 +71,21 @@ public class GameEntity {
 	
 	public Mesh getMesh() {
 		return mesh;
+	}
+	
+	public void increaseAllFun(float tx, float ty, float tz, float scale, float rx, float rz, float ry) {
+		//position.x += tx * 0.05f;
+	    //position.y += ty * 0.05f;
+		//position.z += tz * 0.05f;
+		
+		if (this.scale < 2.0f) {
+			this.scale += scale * 0.02f;
+		} else {
+			this.scale = -this.scale;
+		}
+		
+		rotation.x += rx * 0.05f;
+		rotation.y += ry * 0.05f;
+		rotation.z += rz * 0.05f;
 	}
 }

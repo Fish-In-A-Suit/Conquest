@@ -57,12 +57,35 @@ public class Matrix4f {
 		return extendedVec;
 	}
 	
+	/**
+	 * Multiplies the calling matrix by the matrix which is input as the parameter
+	 * @param mat
+	 * @return
+	 */
 	public Matrix4f multiplyByMatrix(Matrix4f mat) {
-		this.m00 += mat.m00; this.m01 += mat.m10; this.m02 += mat.m20; this.m03 += mat.m30;
-		this.m10 += mat.m01; this.m11 += mat.m11; this.m12 += mat.m21; this.m13 += mat.m31;
-		this.m20 += mat.m02; this.m21 += mat.m12; this.m22 += mat.m22; this.m23 += mat.m32;
-		this.m30 += mat.m03; this.m31 += mat.m13; this.m32 += mat.m23; this.m33 += mat.m33;
-		return this;	
+		Matrix4f result = new Matrix4f();
+		//set first row
+		result.m00 = this.m00*mat.m00 + this.m01*mat.m10 + this.m02*mat.m20 + this.m03*mat.m30;
+		result.m01 = this.m00*mat.m01 + this.m01*mat.m11 + this.m02*mat.m21 + this.m03*mat.m31;
+		result.m02 = this.m00*mat.m02 + this.m01*mat.m12 + this.m02*mat.m22 + this.m03*mat.m32;
+		result.m03 = this.m00*mat.m03 + this.m01*mat.m13 + this.m02*mat.m23 + this.m03*mat.m33;
+		//set 2nd row
+		result.m10 = this.m10*mat.m00 + this.m11*mat.m10 + this.m12*mat.m20 + this.m13*mat.m30;
+		result.m11 = this.m10*mat.m01 + this.m11*mat.m11 + this.m12*mat.m21 + this.m13*mat.m31;
+		result.m12 = this.m10*mat.m02 + this.m11*mat.m12 + this.m12*mat.m22 + this.m13*mat.m32;
+		result.m13 = this.m10*mat.m03 + this.m11*mat.m13 + this.m12*mat.m23 + this.m13*mat.m33;
+		//set 3rd row
+		result.m20 = this.m20*mat.m00 + this.m21*mat.m10 + this.m22*mat.m20 + this.m23*mat.m30;
+		result.m21 = this.m20*mat.m01 + this.m21*mat.m11 + this.m22*mat.m21 + this.m23*mat.m31;
+		result.m22 = this.m20*mat.m02 + this.m21*mat.m12 + this.m22*mat.m22 + this.m23*mat.m32;
+		result.m23 = this.m20*mat.m03 + this.m21*mat.m13 + this.m22*mat.m23 + this.m23*mat.m33;
+		//set 4th row
+		result.m30 = this.m30*mat.m00 + this.m31*mat.m10 + this.m32*mat.m20 + this.m33*mat.m30;
+		result.m31 = this.m30*mat.m01 + this.m31*mat.m11 + this.m32*mat.m21 + this.m33*mat.m31;
+		result.m32 = this.m30*mat.m02 + this.m31*mat.m12 + this.m32*mat.m22 + this.m33*mat.m32;
+		result.m33 = this.m30*mat.m03 + this.m31*mat.m13 + this.m32*mat.m23 + this.m33*mat.m33;
+		
+		return result;
 	}
 	
 	/**
@@ -116,7 +139,7 @@ public class Matrix4f {
 	public Matrix4f translate(float x, float y, float z) {
 		this.m03 = x;
 		this.m13 = y;
-		this.m32 = z;
+		this.m23 = z;
 		return this;
 	}
 	
@@ -243,5 +266,16 @@ public class Matrix4f {
         dest.m33 = m33;
         
         return dest;
+	}
+	/**
+	 * Creates a matrix which scales an object proportionally by the defined scale
+	 * @param scale
+	 * @return
+	 */
+	public Matrix4f scale(float scale) {
+		this.m00 = scale;
+		this.m11 = scale;
+		this.m22 = scale;
+		return this;
 	}
 }

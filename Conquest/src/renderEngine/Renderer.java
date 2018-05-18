@@ -19,7 +19,8 @@ public class Renderer {
 	
 	private final Transformations transformation;
 	
-	private Matrix4f rotationMat;
+	private Matrix4f rotationMat;;
+	
 	
 	private static double angleOfView = 60.0;
 	private static final float FOVY = (float) Math.toRadians(angleOfView);
@@ -92,7 +93,8 @@ public class Renderer {
 			System.out.println("\nwindow width: " + window.getWidth() + " | window height: " + window.getHeight());
 			System.out.println("Entity position: " + entities[0].getPosition().toString());
 			System.out.println("Entity rotation: " + entities[0].getRotation().displayFriendly());
-			System.out.println("Rotation matrix looks like: \n" + rotationMat.toString());
+			System.out.println("Entity scale: " + entities[0].getScale());
+			//System.out.println("Rotation matrix looks like: \n" + rotationMat.toString());
 			//projectionMatrix.displayPerspectiveMatProperties();
 			i = 0;
 		}
@@ -100,11 +102,10 @@ public class Renderer {
 		//render each game item
 		for(GameEntity entity : entities) {
 			Matrix4f translationMat = transformation.getTranslationMatrix(entity.getPosition());
-			shaderProgram.setUniformMatrix("translationMatrix", translationMat);
 			rotationMat = transformation.getRotationMatrix(entity.getRotation().x, entity.getRotation().y, entity.getRotation().z);
-			//entity.increaseRotation(0.035f, 0.035f, 0.035f);
-			//rotationMat = transformation.getRotationMatrix(entity.getRotation().x, entity.getRotation().y, entity.getRotation().z);
-			shaderProgram.setUniformMatrix("rotationMatrix", rotationMat);
+			Matrix4f scaleMat = transformation.getScaleMatrix(entity.getScale());
+			Matrix4f modelMat = transformation.getModelMatrix(translationMat, rotationMat, scaleMat);
+			shaderProgram.setUniformMatrix("modelMatrix", modelMat);
 			entity.getMesh().render();
 		}
 
@@ -127,9 +128,8 @@ public class Renderer {
 	 */
 	private void defineUniformLocations() throws Exception {
 		System.out.println("[Renderer.defineUniformLocations]: Finding locations of the uniform variables... ");
-		shaderProgram.createUniform("translationMatrix");
-		shaderProgram.createUniform("rotationMatrix");
 		shaderProgram.createUniform("projectionMatrix");
+		shaderProgram.createUniform("modelMatrix");
 	}
 
 	
