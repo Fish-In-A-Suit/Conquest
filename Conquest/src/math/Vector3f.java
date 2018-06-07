@@ -14,6 +14,21 @@ public class Vector3f {
 		this.z = z;
 	}
 	
+	public Vector3f negate() {
+		float newX = -this.x;
+		float newY = -this.y;
+		float newZ = -this.z;
+		
+		return new Vector3f(newX, newY, newZ);
+	}
+	
+	public Vector3f add(Vector3f vec) {
+		x += vec.x;
+		y += vec.y;
+		z += vec.z;
+		return this;
+	}
+	
 	public String toString() {
 		return "Vector3f: " + x + " " + y + " " + z;
 	}

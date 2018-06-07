@@ -2,11 +2,13 @@ package math;
 
 import math.Matrix4f;
 import math.Vector3f;
+import renderEngine.Camera;
 
 public class Transformations {
 	private Matrix4f translationMatrix;
 	private Matrix4f rotationMatrix;
 	private Matrix4f scaleMatrix;
+	private Matrix4f viewMatrix;
 	private static Matrix4f projectionMatrix;
 	private Matrix4f modelMatrix;
 	
@@ -19,6 +21,7 @@ public class Transformations {
 		scaleMatrix = new Matrix4f();
 		projectionMatrix = new Matrix4f();
 		modelMatrix = new Matrix4f();
+		viewMatrix = new Matrix4f();
 	}
 
 	/**
@@ -74,6 +77,18 @@ public class Transformations {
 		float aspectRatio = (float) width / height;
 		projectionMatrix.perspective(fovy, aspectRatio, zNear, zFar);
 		return projectionMatrix;
+	}
+	
+	/**
+	 * Creates a viewing matrix based on the fields stored in Camera
+	 * @param camera
+	 * @return
+	 */
+	public Matrix4f getViewMatrix(Camera camera) {
+		Vector3f negativeCamPos = camera.getPosition().negate();
+		viewMatrix.rotateXZY(camera.getRotation().x, camera.getRotation().y, camera.getRotation().z);
+		viewMatrix.translate(negativeCamPos);
+		return viewMatrix;
 	}
 	
 	/**
