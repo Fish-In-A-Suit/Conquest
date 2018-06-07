@@ -134,3 +134,43 @@ The current program can now create a black window and respond to keyboard events
 
 **Issues:**
   - I believe the rotation around the x axis isn't working. Something has to be wrong with matrix multiplication or the like
+  
+### Snapshot 0.7.3: Fixed rotation around X, Y and Z axes
+
+**Changes**:
+  - Changed the way how rotation matrix works. I've created a new method (rotateXYZ) which performs correct rotation. I've left the old methods for rotation in place, which will be fixed in some future update.
+
+### snapshot 0. 7. 4: Implemented scaling transformation
+
+**Goal**: Fix the method for matrix-matrix multiplication and implemnent the scaling matrix
+
+**Additions:**
+  - Added a getModelMatrix(Matrix4f translation, Matrix4f rotation) method, which creates the model/world matrix (the matrix which transforms model's vertices from the model's position to the world). Currently, only translation and rotation transformations apply, scaling will be added shortly.
+  - Implemented scaling effects, which can be achieved by calling transformation.getScaleMatrix(float scale) method. This method is put to use inside the Renderer.render method, where the scale of the entity is updated once per render call. The result obtained by transformation.getScaleMatrix(entity.getScale()) is then used to create the model matrix (along with translation and rotation), which is then sent to the vertex shader.
+
+**Changes:**
+  - Fixed the method multiplyByMatrix(Matrix4f mat) in class Matrix4f to produce correct results.
+  - The vertexShader now only takes in mat4 modelMatrix as a parameter instead of three mat4s for translation, rotation and scale, so as to save up on some gpu power. The model matrix is calculated on the processor.
+
+### snapshot 0.8: Implemented the textures, viewing matrix and mouse input
+
+**Additions**:
+  - Camera class, which holds fields position and rotation. These fields are used to construct the viewing matrix, which translates all of the scene negative relative to the translation of the "camera": If W is pressed, "camera" is translated for -1.0f in the Z axis direction. The scene, is however moved towards the 1.0f in the Z axis, as the camera position is negated prior to being used to construct the viewing matrix. The rotation field of camera class is used without changed by the viewing matrix.
+  - viewMatrix uniform variable in the vertexShader.vs and defined a path to it from the Java code
+  - getViewMatrix(Camera camera) in Transformations.java which constructs the view matrix
+  - a cube which can be moved around (represented in the Cube class, it's temporary)
+  - added a constructor to the Mesh class which accepts a float array of vertices, indices, texture coordinates and a Texture object
+  - added a constructor to the GameEntity class which accepts a float array of vertices, indices, texture coordinates and a String representing the texture file location (out of which the texture will be made)
+  - added left mouse button input
+  - added scroll wheel input --> zoom in/out
+  - made it possible to use textures
+    - created a Texture class which can load a texture and stores its id. This is used by the GameEntity constructor, which takes in a texture path and creates a new Texture for that model (denoted by a variable modelTexture). GameEntity in turn sends that Texture object to Mesh to create it's complete textured Mesh object
+     - textured Mesh instances (instances of Mesh which have a texture) have vertex coordinates stored at the 0th index of the vao and texture coordinates stored at the 1st index of the vao
+  - created a resources folder to store all game-related assets
+    - created subfolder textures, where the textures for the game are stored as images (relative location: resources/textures/FILENAME.png)
+
+**Changes**:
+  - Changed the way how rotations work. Previously, the scene would be rotated if the mouse moved, which was performed by using a cursor callback (this is the "gaming" style of rotation). This is, however, unconvenient for development stages, since it makes rotating around the world feel quite clumsy. Therefore, now one rotates the world around by holding left click at the same time while moving the mouse. The first method of rotation will be introduced later.
+  - mesh.render() now uses method glActiveTexture and glBindTexture so that it caters for texture rendering
+  - removed Quad class 
+  - modified the vertex shader (currently a pass-through for vec2 textureCoordinate at location 1 of the vao, where texture coordinates are stored)
