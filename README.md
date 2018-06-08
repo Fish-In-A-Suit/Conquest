@@ -135,14 +135,15 @@ The current program can now create a black window and respond to keyboard events
 **Issues:**
   - I believe the rotation around the x axis isn't working. Something has to be wrong with matrix multiplication or the like
   
-### Snapshot 0.7.3: Fixed rotation around X, Y and Z axes
+ ### Snapshot 0.7.3: Fixed rotation around X, Y and Z axes
 
 **Changes**:
   - Changed the way how rotation matrix works. I've created a new method (rotateXYZ) which performs correct rotation. I've left the old methods for rotation in place, which will be fixed in some future update.
 
-### snapshot 0. 7. 4: Implemented scaling transformation
+### snapshot 0. 7. 4: implemented scaling transformation
 
-**Goal**: Fix the method for matrix-matrix multiplication and implemnent the scaling matrix
+**Goal:** Fix the method for matrix-matrix multiplication and implemnent the scaling matrix
+
 
 **Additions:**
   - Added a getModelMatrix(Matrix4f translation, Matrix4f rotation) method, which creates the model/world matrix (the matrix which transforms model's vertices from the model's position to the world). Currently, only translation and rotation transformations apply, scaling will be added shortly.
@@ -174,3 +175,4 @@ The current program can now create a black window and respond to keyboard events
   - mesh.render() now uses method glActiveTexture and glBindTexture so that it caters for texture rendering
   - removed Quad class 
   - modified the vertex shader (currently a pass-through for vec2 textureCoordinate at location 1 of the vao, where texture coordinates are stored)
+
