@@ -4,7 +4,10 @@ import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.system.MemoryUtil.*;
 
+import org.lwjgl.glfw.GLFWCursorPosCallback;
 import org.lwjgl.glfw.GLFWKeyCallback;
+import org.lwjgl.glfw.GLFWMouseButtonCallback;
+import org.lwjgl.glfw.GLFWScrollCallback;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
 
@@ -16,6 +19,9 @@ import org.lwjgl.opengl.GL;
 public class Window {
 	public long windowHandle;
 	public GLFWKeyCallback keycallback;
+	public GLFWCursorPosCallback cursorCallback;
+	public GLFWMouseButtonCallback mouseButtonCallback;
+	public GLFWScrollCallback scrollCallback;
 	
 	private int width = 1920;
 	private int height = 1080;
@@ -24,6 +30,12 @@ public class Window {
 	
 	private boolean resized = false;
 	public boolean[] keys = new boolean[35565];
+	private boolean cursorChange;
+	private double mouseX, mouseY; //mouse cursor positions
+	private double deltaMX, deltaMY; //how much has the cursor moved?
+	private boolean mouseLeftPressed, mouseRightPressed;
+	private double scrollAmount;
+	private boolean isScrolled;
 
 	/**
 	 * This method creates the window with it's associated OpenGL context. It also:
@@ -35,6 +47,10 @@ public class Window {
 		if(glfwInit() == false) {
 			throw new IllegalStateException("Unable to initialize GLFW!");
 		}
+		System.out.println("[Window.init]: Creating window... ");
+		
+		mouseX = 0;
+		mouseY = 0;
 		
 		glfwDefaultWindowHints();
 		glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
@@ -65,6 +81,32 @@ public class Window {
 			}
 		}));
 		
+		//xpos = current x position of the cursor; ypos = current y position of the cursor --> relative to the upper-left corner
+		glfwSetCursorPosCallback(windowHandle, cursorCallback = GLFWCursorPosCallback.create((window, xpos, ypos) -> {
+			deltaMX = xpos - mouseX;
+			deltaMY = ypos - mouseY;
+			cursorChange = true;
+			mouseX = xpos;
+			mouseY = ypos;
+		}));
+		
+		glfwSetMouseButtonCallback(windowHandle, mouseButtonCallback = GLFWMouseButtonCallback.create((window, button, action, mods) -> {
+			if (button == GLFW_MOUSE_BUTTON_1 && action == GLFW_PRESS) {
+				mouseLeftPressed = true;
+			} else if (button == GLFW_MOUSE_BUTTON_1 && action == GLFW_RELEASE) {
+				mouseLeftPressed = false;
+			}
+		}));
+		
+		/*
+		 * This method gets called every time the mouse wheel is scrolled.
+		 * yoffset represents the vertical ("normal") scroll amount
+		 */
+		glfwSetScrollCallback(windowHandle, scrollCallback = GLFWScrollCallback.create((window, xoffset, yoffset) -> {
+			scrollAmount = yoffset;
+			isScrolled = true;
+		}));
+		
 		GLFWVidMode vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
 		glfwSetWindowPos(windowHandle, (vidmode.width() - width) / 2, (vidmode.height() - height) / 2 );
 		
@@ -77,7 +119,17 @@ public class Window {
 		
 		glEnable(GL_DEPTH_TEST);
 		
-		System.out.println("[Window] OpenGL version: " + glGetString(GL_VERSION));
+		System.out.println("[Window.init] OpenGL version: " + glGetString(GL_VERSION));
+	}
+	
+	//set the value for whether the cursor has moved
+	public void setCursorChange(boolean value) {
+		cursorChange = value;
+	}
+	
+	//has the cursor moved?
+	public boolean getCursorChange() {
+		return cursorChange;
 	}
 	
 	public void setResized(boolean resized) {
@@ -95,5 +147,28 @@ public class Window {
 	public int getHeight() {
 		return height;
 	}
-
+	
+	public double getDeltaMX() {
+		return deltaMX;
+	}
+	
+	public double getDeltaMY() {
+		return deltaMY;
+	}
+	
+	public boolean isMouseLeftPressed() {
+		return mouseLeftPressed;
+	}
+	
+	public boolean isScrolled() {
+		return isScrolled;
+	}
+	
+	public void setScrolled(boolean value) {
+		isScrolled = value;
+	}
+	
+	public double getScrollAmount() {
+		return scrollAmount;
+	}
 }

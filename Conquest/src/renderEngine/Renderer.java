@@ -16,18 +16,13 @@ import models.GameEntity;
 public class Renderer {
 	
 	private ShaderProgram shaderProgram;
-	
 	private final Transformations transformation;
-	
 	private Matrix4f rotationMat;;
-	
 	
 	private static double angleOfView = 60.0;
 	private static final float FOVY = (float) Math.toRadians(angleOfView);
 	private static final float zNear = 0.01f;
 	private static final float zFar = 1000.0f;
-	
-	//private Matrix4f projectionMatrix = transformation.getProjectionMatrix(FOVY, window.getWidth(), window.getHeight(), zNear, zFar);
 	
 	public Renderer() {
 		transformation = new Transformations();
@@ -39,40 +34,34 @@ public class Renderer {
 	 * @throws Exception 
 	 */
 	public void init() throws Exception {
-		System.out.println("[Renderer] Initializing renderer... ");
+		System.out.println("[Renderer.init] Initializing renderer... ");
 		shaderProgram = new ShaderProgram();
 		
-		System.out.println("[Renderer] Creating vertex shader... ");
+		System.out.println("[Renderer.init] Creating vertex shader... ");
 		shaderProgram.createVertexShader(FileUtilities.loadResource("/shaders/vertexShader.vs"));
 		
-		System.out.println("[Renderer] Creating fragment shader... ");
+		System.out.println("[Renderer.init] Creating fragment shader... ");
 		shaderProgram.createFragmentShader(FileUtilities.loadResource("/shaders/fragmentShader.fs"));
 		
-		System.out.println("[Renderer] Linking shaderProgram... ");
+		System.out.println("[Renderer.init] Linking shaderProgram... ");
 		shaderProgram.link();
 		
-		System.out.println("[Renderer]: Finding uniform variable locations...");
+		System.out.println("[Renderer.init]: Finding uniform variable locations...");
 		defineUniformLocations();
 	}
 	
 	/**
-	 * This method clears the background colour of the screen
-	 */
-	public void clear() {
-		glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	}
-	
-	/**
-	 * This method handles window resize events and draws the specified Mesh
-	 * instance onto the window.
+	 * This method handles window resize events and draws the specified GameEntity objects
+	 * stored in entities on the screen. Furthermore, it updates the scene based on
+	 * the fields of the Camera object specified (camera)
 	 * 
 	 * @param window The window object
 	 * @param mesh An instance of Mesh class which we want to render 
+	 * @param camera The Camera instance depending on which to update the scene
 	 */
 	
 	int i = 0;
-	public void render(Window window, GameEntity[] entities) {
+	public void render(Window window, GameEntity[] entities, Camera camera) {
 		i++;
 		
 		clear();
@@ -84,9 +73,14 @@ public class Renderer {
 
 		shaderProgram.bind();
 		
+		Matrix4f viewMatrix = transformation.getViewMatrix(camera);
+		shaderProgram.setUniformMatrix("viewMatrix", viewMatrix);
+		
 		//update projection matrix
 		Matrix4f projectionMatrix = transformation.getProjectionMatrix(FOVY, window.getWidth(), window.getHeight(), zNear, zFar);
 		shaderProgram.setUniformMatrix("projectionMatrix", projectionMatrix);
+		
+		shaderProgram.setUniformInt("texture_sampler", 0);
 		
 		if (i == 80) {
 			//System.out.println("\nProjection matrix looks like: \n" + projectionMatrix.toString());
@@ -108,18 +102,17 @@ public class Renderer {
 			shaderProgram.setUniformMatrix("modelMatrix", modelMat);
 			entity.getMesh().render();
 		}
+		camera.resetRotation();
 
 		shaderProgram.unbind();
 	}
 	
 	/**
-	 * This method removes the active shader program from memory
+	 * This method clears the background colour of the screen
 	 */
-	public void cleanup() {
-		System.out.println("[Renderer.cleanup]: Cleaning up shader program...");
-		if (shaderProgram != null) {
-			shaderProgram.cleanup();
-		}
+	public void clear() {
+		glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	}
 	
 	/**
@@ -130,9 +123,17 @@ public class Renderer {
 		System.out.println("[Renderer.defineUniformLocations]: Finding locations of the uniform variables... ");
 		shaderProgram.createUniform("projectionMatrix");
 		shaderProgram.createUniform("modelMatrix");
+		shaderProgram.createUniform("viewMatrix");
+		shaderProgram.createUniform("texture_sampler");
 	}
 
-	
-	
-
+	/**
+	 * This method removes the active shader program from memory
+	 */
+	public void cleanup() {
+		System.out.println("[Renderer.cleanup]: Cleaning up shader program...");
+		if (shaderProgram != null) {
+			shaderProgram.cleanup();
+		}
+	}
 }

@@ -267,6 +267,55 @@ public class Matrix4f {
         
         return dest;
 	}
+	
+	public Matrix4f rotateXZY(float rx, float ry, float rz) {
+		float sinX = (float) Math.sin(rx);
+		float cosX = (float) Math.cos(rx);
+		float sinY = (float) Math.sin(ry);
+		float cosY = (float) Math.cos(ry);
+		float sinZ = (float) Math.sin(rz);
+		float cosZ = (float) Math.cos(rz);
+		float mSinX = -sinX;
+		float mSinY = -sinY;
+		float mSinZ = -sinZ;
+		
+		//rotate x
+		float nm10 = m10 * cosX + m20 * sinX;
+        float nm11 = m11 * cosX + m21 * sinX;
+        float nm12 = m12 * cosX + m22 * sinX;
+        float nm13 = m13 * cosX + m23 * sinX;
+        float nm20 = m10 * mSinX + m20 * cosX;
+        float nm21 = m11 * mSinX + m21 * cosX;
+        float nm22 = m12 * mSinX + m22 * cosX;
+        float nm23 = m13 * mSinX + m23 * cosX;
+        //rotateY
+        float nm00 = m00 * cosY + nm20 * mSinY;
+        float nm01 = m01 * cosY + nm21 * mSinY;
+        float nm02 = m02 * cosY + nm22 * mSinY;
+        float nm03 = m03 * cosY + nm23 * mSinY;
+        this.m20 = m00 * sinY + nm20 * cosY;
+        this.m21 = m01 * sinY + nm21 * cosY;
+        this.m22 = m02 * sinY + nm22 * cosY;
+        this.m23 = m03 * sinY + nm23 * cosY;
+        //rotateZ
+        this.m00 = nm00 * cosZ + nm10 * sinZ;
+        this.m01 = nm01 * cosZ + nm11 * sinZ;
+        this.m02 = nm02 * cosZ + nm12 * sinZ;
+        this.m03 = nm03 * cosZ + nm13 * sinZ;
+        this.m10 = nm00 * mSinZ + nm10 * cosZ;
+        this.m11 = nm01 * mSinZ + nm11 * cosZ;
+        this.m12 = nm02 * mSinZ + nm12 * cosZ;
+        this.m13 = nm03 * mSinZ + nm13 * cosZ;
+        
+        //copy last column from this
+        this.m30 = m30;
+        this.m31 = m31;
+        this.m32 = m32;
+        this.m33 = m33;
+        
+        return this;
+	}
+	
 	/**
 	 * Creates a matrix which scales an object proportionally by the defined scale
 	 * @param scale

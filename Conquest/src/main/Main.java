@@ -79,16 +79,18 @@ public class Main implements Runnable {
 				updates ++;
 				delta--;
 			}
-			renderer.render(window, game.getGameEntities());		    
+			renderer.render(window, game.getGameEntities(), game.getCamera());		    
 			frames++;
-			//model world position should be displayed here, but I'm then having trouble with displaying fps and ups
-					
+			
+			//game.getGameEntities()[0].increaseRotation(1.0f, 0, 1.0f);
+			
 			if (System.currentTimeMillis() - timer > 1000) {
 				timer += 1000;
 				setWindowTitle(updates, frames, game.getGameEntities()[0]);
 				System.out.println(updates + " ups, " + frames + " fps");
 				updates = 0;
 				frames = 0;
+				
 				if (assertions == true) {
 					runAssertions();
 				}

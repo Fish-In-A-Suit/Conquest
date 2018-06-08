@@ -145,6 +145,15 @@ public class ShaderProgram {
 		glUniformMatrix4fv(uniforms.get(uniformName), false, matrixBuffer);	
 	}
 	
+	/**
+	 * Allows to set an integer value for a uniform
+	 * @param uniformName
+	 * @param value
+	 */
+	public void setUniformInt(String uniformName, int value) {
+		glUniform1i(uniforms.get(uniformName), value);
+	}
+	
 /*	
 	public void defineMappings() {
 		glBindAttribLocation(programID, 0, "position");

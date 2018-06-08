@@ -42,6 +42,4 @@ public class BufferUtilities {
 		result.put(array).flip();
 		return result;	
 	}
-	
-
 }
