@@ -84,13 +84,19 @@ public class Game {
 		} else if (window.keys[GLFW_KEY_D]) {
 			camera.increasePosition(1.0f, 0f, 0f);
 		}
-		
+		//developmental mode of rotation
 		//if is left clicked and moved at the same time, rotate the scene
 		if(window.getCursorChange() && window.isMouseLeftPressed()) {
 			camera.increaseRotation(window.getDeltaMX(), window.getDeltaMY());
 			window.setCursorChange(false);
 		}
 		
+		/* "Gaming mode of rotating the camera"
+		if(window.getCursorChange()) {
+			camera.increaseRotation(window.getDeltaMX(), window.getDeltaMY());
+			window.setCursorChange(false);
+		}
+		*/
 		//if is scrolled, zoom in
 		if (window.isScrolled()) {
 			camera.increasePosition(0, 0, -(float)window.getScrollAmount());
