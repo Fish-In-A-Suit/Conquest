@@ -1,9 +1,7 @@
 package main;
 
 import static org.lwjgl.glfw.GLFW.*;
-
-
-import models.Cube;
+import loaders.OBJLoader;
 import models.GameEntity;
 import models.Mesh;
 import renderEngine.Camera;
@@ -15,7 +13,6 @@ import renderEngine.Window;
  *
  */
 public class Game {
-	private Cube cube;
 	private GameEntity[] entities;
 	private Mesh mesh;
 	private Camera camera;
@@ -26,18 +23,18 @@ public class Game {
 	 * Creates a new array of GameEntities and stores entity in that array.
 	 */
 	public Game() {
-		cube = new Cube();
-		
-		System.out.println("[Game.Game]: Creating the cube GameEntity... ");
 		GameEntity cubeEntity = null;
+		GameEntity pineTree = null;
 		try {
-			cubeEntity = new GameEntity(cube.positions, cube.indices, cube.textureCoords, "resources/textures/concrete.png");
+			System.out.println("[Game.Game]: Creating cube... ");
+			cubeEntity = OBJLoader.loadObjModel("cube", "cubeTexture1");
+			pineTree = OBJLoader.loadObjModel("pineTree", "pineTree");
 		} catch (Exception e) {
+			System.err.println("[Game.Game] An error has occurred while trying to load a game entity");
 			e.printStackTrace();
 		}
-		
-		System.out.println("[Game.Game]: Adding entity inside array entities...");
-		entities = new GameEntity[] { cubeEntity };
+		System.out.println("[Game.Game] Adding cube to the entities array");
+		entities = new GameEntity[] {pineTree};
 		
 		System.out.println("[Game.Game]: Creating a new camera object... ");
 		camera = new Camera();

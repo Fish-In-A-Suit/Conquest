@@ -40,5 +40,9 @@ public class Vector3f {
 	public String displayFriendly() {
 		return "x: " + (int)x + " y: " + (int)y + " z: " + (int)z;
 	}
+	
+	public float length() {
+		return (float) Math.sqrt(Math.pow(x, 2) + Math.pow(y,  2) + Math.pow(z, 2));
+	}
 
 }

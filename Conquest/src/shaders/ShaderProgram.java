@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import math.Matrix4f;
+import math.Vector3f;
 import utils.BufferUtilities;
 
 public class ShaderProgram {
@@ -152,6 +153,10 @@ public class ShaderProgram {
 	 */
 	public void setUniformInt(String uniformName, int value) {
 		glUniform1i(uniforms.get(uniformName), value);
+	}
+	
+	public void setUniformVector(String uniformName, Vector3f vec) {
+		glUniform3f(uniforms.get(uniformName), vec.x, vec.y, vec.z);
 	}
 	
 /*	
