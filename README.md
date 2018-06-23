@@ -175,4 +175,20 @@ The current program can now create a black window and respond to keyboard events
   - mesh.render() now uses method glActiveTexture and glBindTexture so that it caters for texture rendering
   - removed Quad class 
   - modified the vertex shader (currently a pass-through for vec2 textureCoordinate at location 1 of the vao, where texture coordinates are stored)
+  
+### snapshot 0.8.1: added the missing classes for Camera and Texture (I've failed to include them in the previous snapshot)
+
+### snapshot 0.9: implemented support for textured wavefront .obj models with triangulated faces
+
+**Additions:**
+  - now, 3D models can be loaded from .obj files (no need for hard coding them anymore :D). Note, however, that the faces of models have to be triangulated (when exporting a .obj model, make sure to tick the box "Triangulate faces". Also, the .obj parser can only handle models which are textured and therefore follow the "v1/vt1/vn1, v2/vt2/vn2, ..." paradigm (ie. the lines which represent faces (they are beginning with an f) have to follow the v1/vt1/vn1 pattern).
+  - the .obj parser can be found in the package named loaders. It consists of three classes, the one of main importance being OBJLoader.java
+    - OBJLoader: This is the class which provides a way (method loadObjModel(String fileName, String textureName)) to read a model represented by a .obj wavefront file and use this information to return a renderable GameEntity instance. This is a very quick way of loading models, since a GameEntity instance for a specific 3D model can be created from only one line of code inside Game.java
+    - ModelData: This class provides a storage for data which is read from a .obj file representing a 3D model (and properly re-ordered into float or int arrays so it can be read by OpenGL)
+    - Vertex: This class represents a single vertex of a mesh. A vertex has its associated position, a texture and normal index (which are read from lines beginning with an f), a duplicate vertex (if this vertex is a part of a texture seam) and an index (which denotes it's location in the vertices ArrayList).
+  - added class ArrayUtils in utils package, which provides various functionality regarding arrays (for example, displaying arrays, getting arrays as Strings, converting Lists to arrays, etc)
+  - added Vector2f class (due to a need to store texture coordinates
+  - fragment shader has new uniform variables (vec3 colour, int useColour). useColour is basically used a flag which denotes whether a model to be rendered is textured or not. This is set from the render of Renderer.java when rendering: shaderProgram.setUniformInt("useColour", mesh.isTextured() ? 0 : 1); If a model isn't textured, then the colour (usually default) of the model (which is sent to the fragment shader from Renderer.render prior to rendering the model) is used: fragColour = vec4(colour, 1); Otherwise, if the model is textured, then texture coordinates are used to draw the texture: fragColour = texture(texture_sampler, outTexCoord);
+  - added new constructor to GameEntity, which can create a GameEntity instance out of ModelData instance (which is created by loadObjModel when) and a specified texture name inside resources/textures/ without an extension
+  - Mesh instances now hace a Vector3f colour (default colour bright pink (rgb(237, 14, 196) | OpenGL(0.93f, 0.05f, 0.77f)) is used
 
