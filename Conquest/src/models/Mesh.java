@@ -3,6 +3,8 @@ package models;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
+
+import math.Vector3f;
 import renderEngine.Texture;
 
 import static org.lwjgl.opengl.GL11.*;
@@ -11,6 +13,7 @@ import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL20.*;
 import static org.lwjgl.opengl.GL30.*;
 
+import utils.ArrayUtils;
 import utils.BufferUtilities;
 
 /**
@@ -24,15 +27,19 @@ public class Mesh {
 	private int verticesVboID;
 	private int indicesVboID;
 	private int textureVboID;
+	private int normalsVboID;
 	private int colourVboID;
 	private int vertexCount;
 	
-	private FloatBuffer verticesBuffer;
+	private FloatBuffer vPosBuffer;
 	private FloatBuffer textureBuffer;
+	private FloatBuffer normalsBuffer;
 	private FloatBuffer colourBuffer;
 	private IntBuffer indicesBuffer;
 	
 	private renderEngine.Texture texture;
+	private Vector3f DEFAULT_COLOUR = new Vector3f(0.93f, 0.05f, 0.77f);
+	private Vector3f colour;
 	
 	ArrayList<Integer> vbos;
 	ArrayList<Integer> vaos;
@@ -41,20 +48,22 @@ public class Mesh {
 	/**
 	 * This constructor creates a renderable object (instance of Mesh with its texture) out of input parameters by storing them
 	 * in the vao of that Mesh instance
-	 * @param vertices The vertex positions of a model
+	 * @param vPos The vertex positions of a model
 	 * @param indices The indices to tell OpenGL how to connect the vertices
 	 * @param texCoords Texture coordinates (used for texture mapping)
 	 * @param texture A Texture object
 	 */
-	public Mesh(float[] vertices, int[] indices, float[] texCoords, renderEngine.Texture texture) {
+	public Mesh(float[] vPos, int[] indices, float[] texCoords, renderEngine.Texture texture) {
 		System.out.println("[Mesh.Mesh]: Creating a new textured Mesh instance... ");
-		verticesBuffer = null;
+		
+		vPosBuffer = null;
 		textureBuffer = null;
 		indicesBuffer = null;
 		
 		try {
 			this.texture = texture;
 		    vertexCount = indices.length;
+		    colour = DEFAULT_COLOUR;
 		    
 		    vbos = new ArrayList<>();
 		    vaos = new ArrayList<>();
@@ -65,7 +74,7 @@ public class Mesh {
 			vaos.add(vaoID);
 			glBindVertexArray(vaoID);
 			
-			setupVerticesVbo(vertices);
+			setupVerticesVbo(vPos);
 			
 			setupIndicesBuffer(indices);
 			
@@ -77,10 +86,48 @@ public class Mesh {
 			glBindVertexArray(0);
 		} finally {
 			System.out.println("[Mesh.Mesh]: Textured Mesh instance has been created successfully... ");
+			
+			System.out.println("[Mesh.Mesh]: Displaying Mesh information: ");
+			System.out.println("[Mesh.Mesh]:  Vertices array: " + ArrayUtils.getFloatArray(vPos));
+			System.out.println("[Mesh.Mesh]:  Indices array: " + ArrayUtils.getIntArray(indices));
+			System.out.println("[Mesh.Mesh]:  Texture coordinates: " + ArrayUtils.getFloatArray(texCoords));
 		}
 	}
 	
-	public Mesh(float[] vertices, int[] indices, float[] colours) {
+	public Mesh(float[] vPos, float[] texCoords, float[] normals, int[] indices) {
+		System.out.println("Creating a new Mesh instance...");
+		vPosBuffer = null;
+		textureBuffer = null;
+		normalsBuffer = null;
+		indicesBuffer = null;
+		
+		try {
+			colour = DEFAULT_COLOUR;
+			vertexCount = indices.length;
+			vbos = new ArrayList<>();
+			
+			vaoID = glGenVertexArrays();
+			glBindVertexArray(vaoID);
+			
+			setupVerticesVbo(vPos);
+			setupTextureVbo(texCoords);
+			setupNormalsVbo(normals);
+			setupIndicesBuffer(indices);
+			
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
+			glBindVertexArray(0);			
+		} finally {
+			System.out.println("Finished creating Mesh instance");
+			
+			System.out.println("[Mesh.Mesh]: Displaying Mesh information: ");
+			System.out.println("[Mesh.Mesh]:  Vertices array: " + ArrayUtils.getFloatArray(vPos));
+			System.out.println("[Mesh.Mesh]:  Texture coordinates: " + ArrayUtils.getFloatArray(texCoords));
+			System.out.println("[Mesh.Mesh]:  Normals: " + ArrayUtils.getFloatArray(normals));
+			System.out.println("[Mesh.Mesh]:  Indices array: " + ArrayUtils.getIntArray(indices));
+		}
+	}
+	
+	public Mesh(float[] vPos, int[] indices, float[] colours) {
 		vbos = new ArrayList<>();
 		vaos = new ArrayList<>();
 		
@@ -89,7 +136,7 @@ public class Mesh {
 		vaos.add(vaoID);
 		glBindVertexArray(vaoID);
 		
-		setupVerticesVbo(vertices);
+		setupVerticesVbo(vPos);
 		setupIndicesBuffer(indices);
 		setupColourVbo(colours);
 		
@@ -108,7 +155,7 @@ public class Mesh {
 		System.out.println("   - [Mesh] creating vertices vbo (verticesVboID) and verticers buffer (verticesBuffer)..."); 
 		verticesVboID = glGenBuffers();
 		vbos.add(verticesVboID);
-		verticesBuffer = BufferUtilities.storeDataInFloatBuffer(vertices);
+		vPosBuffer = BufferUtilities.storeDataInFloatBuffer(vertices);
 		
 		System.out.println("   - [Mesh] Checking vertices");
 		//checkVertices(vertices);
@@ -117,7 +164,7 @@ public class Mesh {
 		glBindBuffer(GL_ARRAY_BUFFER, verticesVboID);
 		
 		System.out.println("   - [Mesh] Buffering data of verticesBuffer to GL_ARRAY_BUFFER");
-		glBufferData(GL_ARRAY_BUFFER, verticesBuffer, GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, vPosBuffer, GL_STATIC_DRAW);
 		
 		System.out.println("   - [Mesh] Sending verticesVboID to attribute list index 0 of the active vao...");
 		glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0);
@@ -146,7 +193,7 @@ public class Mesh {
 	}
 	
 	/**
-	 * This method sets up the colour vbo for a mesh object (buffers data to it and assigns it to attribute list
+	 * This method sets up the texture vbo for a mesh object (buffers data to it and assigns it to attribute list
 	 * index 1 of the vao)
 	 * 
 	 * @param colours - an array of colours of the vertices of a model
@@ -169,6 +216,20 @@ public class Mesh {
 		glVertexAttribPointer(1, 2, GL_FLOAT, false, 0, 0);
 	}
 	
+	/**
+	 * This method stores normal vectors of a model as a vbo at index 2 of the model vao
+	 * @param normals
+	 */
+	private void setupNormalsVbo(float[] normals) {
+		normalsVboID = glGenBuffers();
+		vbos.add(normalsVboID);
+		normalsBuffer = BufferUtilities.storeDataInFloatBuffer(normals);
+		glBindBuffer(GL_ARRAY_BUFFER, normalsVboID);
+		glBufferData(GL_ARRAY_BUFFER, normalsBuffer, GL_STATIC_DRAW);
+		glVertexAttribPointer(2, 3, GL_FLOAT, false, 0, 0);
+		
+	}
+	
 	private void setupColourVbo(float[] colours) {
 		System.out.println("[Mesh] Creating colour vbo (colourVboID)...");
 		colourVboID = glGenBuffers();
@@ -188,20 +249,30 @@ public class Mesh {
 	}
 	
 	public void render() {
-		//activate first texture bank
-		glActiveTexture(GL_TEXTURE0);
-		//bind the texture
-		glBindTexture(GL_TEXTURE_2D, texture.getId());
+		if (texture != null) {
+			glActiveTexture(GL_TEXTURE0);
+			//bind the texture
+			glBindTexture(GL_TEXTURE_2D, texture.getId());
+		}
+		
 		glBindVertexArray(getVaoID());
+		
 		glEnableVertexAttribArray(0);
 		glEnableVertexAttribArray(1);
+		glEnableVertexAttribArray(2);
+		
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, getIndicesVboID());
 
 		glDrawElements(GL_TRIANGLES, getVertexCount(), GL_UNSIGNED_INT, 0);
 		
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+		
+		glDisableVertexAttribArray(2);
+		glDisableVertexAttribArray(1);
 		glDisableVertexAttribArray(0);
+		
 		glBindVertexArray(0);
+		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 	
 	/**
@@ -211,8 +282,14 @@ public class Mesh {
 		System.out.println("[Mesh.cleanUp]: Cleaning up the mesh object...");
 		glDisableVertexAttribArray(0);
 		
+		System.out.println("[Mesh.cleanUp]: Size of textures: " + textures.size());
+		
 		System.out.println("[Mesh.cleanUp]: Cleaning up textures...");
 		for(Texture texture : textures) {
+			texture.cleanup();
+		}
+		
+		if (texture != null) {
 			texture.cleanup();
 		}
 		
@@ -254,6 +331,27 @@ public class Mesh {
 	 */
 	public int getVerticesVboID() {
 		return verticesVboID;
+	}
+	
+	public void setTexture(Texture texture) {
+		this.texture = texture;
+	}
+	
+	public Texture getTexture() {
+		return texture;
+	}
+	
+	public boolean isTextured() {
+		return this.texture != null;
+	}
+	
+	public void setColour(float x, float y, float z) {
+		Vector3f newColour = new Vector3f(x, y, z);
+		colour = newColour;
+	}
+	
+	public Vector3f getColour() {
+		return colour;
 	}
 	
 

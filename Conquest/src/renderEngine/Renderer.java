@@ -7,6 +7,7 @@ import shaders.ShaderProgram;
 import utils.FileUtilities;
 import math.Transformations;
 import models.GameEntity;
+import models.Mesh;
 
 /**
  * This class deals with rendering to the window
@@ -95,12 +96,17 @@ public class Renderer {
 		
 		//render each game item
 		for(GameEntity entity : entities) {
+			Mesh mesh = entity.getMesh();
 			Matrix4f translationMat = transformation.getTranslationMatrix(entity.getPosition());
 			rotationMat = transformation.getRotationMatrix(entity.getRotation().x, entity.getRotation().y, entity.getRotation().z);
 			Matrix4f scaleMat = transformation.getScaleMatrix(entity.getScale());
 			Matrix4f modelMat = transformation.getModelMatrix(translationMat, rotationMat, scaleMat);
 			shaderProgram.setUniformMatrix("modelMatrix", modelMat);
-			entity.getMesh().render();
+			
+			shaderProgram.setUniformVector("colour", mesh.getColour());
+			shaderProgram.setUniformInt("useColour", mesh.isTextured() ? 0 : 1);
+			
+			mesh.render();
 		}
 		camera.resetRotation();
 
@@ -125,6 +131,8 @@ public class Renderer {
 		shaderProgram.createUniform("modelMatrix");
 		shaderProgram.createUniform("viewMatrix");
 		shaderProgram.createUniform("texture_sampler");
+		shaderProgram.createUniform("colour");
+		shaderProgram.createUniform("useColour");
 	}
 
 	/**

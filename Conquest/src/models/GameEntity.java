@@ -1,5 +1,6 @@
 package models;
 
+import loaders.ModelData;
 import math.Vector3f;
 import models.Mesh;
 import renderEngine.Texture;
@@ -10,9 +11,8 @@ import renderEngine.Texture;
  *
  */
 public class GameEntity {
-	
 	private final Mesh mesh;
-	private final Texture modelTexture;
+	private Texture modelTexture;
 	
 	private Vector3f position;
 	private float scale;
@@ -28,11 +28,41 @@ public class GameEntity {
 	 */
 	public GameEntity(float[] vPositions, int[] indices, float[] textureCoordinates, String texturePath) throws Exception{
 		System.out.println("[GameEntity.GameEntity]: Creating a new model texture...");
-		modelTexture = new Texture(texturePath);
+		modelTexture = new renderEngine.Texture(texturePath);
 		System.out.println("[GameEntity.GameEntity]: Creating new mesh based on parameters... ");
 		mesh = new Mesh(vPositions, indices, textureCoordinates, modelTexture);
 		
 		System.out.println("[GameEntity.GameEntity]: Initializing position, scale and rotation instance fields... ");
+		position = new Vector3f(0, 0, 0);
+		scale = 1;
+		rotation = new Vector3f(0, 0, 0);
+	}
+	
+	public GameEntity(ModelData data, String texturePath) throws Exception {
+		modelTexture = new renderEngine.Texture(texturePath);
+		mesh = new Mesh(data.getVertices(), data.getIndices(), data.getTextureCoordinates(), modelTexture);
+		setDefaultPRS();
+	}
+	
+	public GameEntity(float[] vPos, float[] texCoords, float[] normals, int[] indices) {
+		mesh = new Mesh(vPos, texCoords, normals, indices);
+		modelTexture = mesh.getTexture();
+		
+		position = new Vector3f(0, 0, 0);
+		scale = 1;
+		rotation = new Vector3f(0, 0, 0);
+	}
+	
+	public GameEntity(float[] vPos, float[] texCoords, float[] normals, int[] indices, String texturePath) {
+		mesh = new Mesh(vPos, texCoords, normals, indices);
+		modelTexture = null;
+		try {
+			modelTexture = new Texture(texturePath);
+		} catch (Exception e) {
+			System.err.println("[Game.Game]: Failed to create modelTexture!");
+			e.printStackTrace();
+		}
+		
 		position = new Vector3f(0, 0, 0);
 		scale = 1;
 		rotation = new Vector3f(0, 0, 0);
@@ -116,5 +146,26 @@ public class GameEntity {
 		rotation.x += rx * 0.05f;
 		rotation.y += ry * 0.05f;
 		rotation.z += rz * 0.05f;
+	}
+	
+	public void displayInformation() {
+		System.out.println("[GameEntity.GameEntity]:  Displaying GameEntity information: ");
+		if (mesh != null) {
+			System.out.println("  - mesh exists");
+		} else System.out.println("mesh DOESN'T EXIST!");
+		
+		if (modelTexture != null) {
+			System.out.println("  - modelTexture exists");
+			System.out.println("  - modelTexture id = " + modelTexture.getId());
+		} else {
+			System.out.println("  - modelTexture DOESN'T EXIST");
+		}
+	}
+	
+	//sets default position, rotation and scale
+	private void setDefaultPRS() {
+		position = new Vector3f(0, 0, 0);
+		rotation = new Vector3f(0, 0, 0);
+		scale = 1;
 	}
 }
