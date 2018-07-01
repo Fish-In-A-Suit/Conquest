@@ -191,4 +191,21 @@ The current program can now create a black window and respond to keyboard events
   - fragment shader has new uniform variables (vec3 colour, int useColour). useColour is basically used a flag which denotes whether a model to be rendered is textured or not. This is set from the render of Renderer.java when rendering: shaderProgram.setUniformInt("useColour", mesh.isTextured() ? 0 : 1); If a model isn't textured, then the colour (usually default) of the model (which is sent to the fragment shader from Renderer.render prior to rendering the model) is used: fragColour = vec4(colour, 1); Otherwise, if the model is textured, then texture coordinates are used to draw the texture: fragColour = texture(texture_sampler, outTexCoord);
   - added new constructor to GameEntity, which can create a GameEntity instance out of ModelData instance (which is created by loadObjModel when) and a specified texture name inside resources/textures/ without an extension
   - Mesh instances now hace a Vector3f colour (default colour bright pink (rgb(237, 14, 196) | OpenGL(0.93f, 0.05f, 0.77f)) is used
+  
+### snapshot 0.10: implemented simple ambient and diffuse lighting
+
+**Additions:**
+  - added Light class inside models, which represents a light entity
+  - created an array of Light instances inside Game.java, which holds all present Light instances of a scene
+  - implemented ambient lighting component
+    - added ambientStrength to fragment shader, which is multiplied by lightColour to produce vec3 ambient, which is summed with vec3 diffuse prior to being multiplied with the fragment colour
+  - implemented diffuse lighting component
+    - added uniform vec3 lightPosition to the vertex shader
+    - added uniform vec3 lightColour to the fragment shader
+    - normal vectors (which are used for calculating DLC) are stored inside the second attribute list of the vao of a Mesh instance. They are read by the vertex shader and passed as surfaceNormal vec3 instances to the fragment shader after being multiplied by the model (translation, rotation, scale) matrix.
+
+**Changes:**
+  - changed Mesh constructor from Mesh(float[] vPos, int[] indices, float[] texCoords, renderEngine.Texture texture) to Mesh(float[] vPos, int[] indices, float[] texCoords, float[] normals, renderEngine.Texture texture)
+  - changed the Renderer.render method to accept an array of Light instances: render(Window window, GameEntity[] entities, Light[] lights, Camera camera) 
+  
 
