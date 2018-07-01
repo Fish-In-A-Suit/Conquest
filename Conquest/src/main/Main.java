@@ -79,7 +79,7 @@ public class Main implements Runnable {
 				updates ++;
 				delta--;
 			}
-			renderer.render(window, game.getGameEntities(), game.getCamera());		    
+			renderer.render(window, game.getGameEntities(), game.getLights(), game.getCamera());		    
 			frames++;
 			
 			//game.getGameEntities()[0].increaseRotation(1.0f, 0, 1.0f);

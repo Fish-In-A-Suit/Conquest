@@ -2,7 +2,9 @@ package main;
 
 import static org.lwjgl.glfw.GLFW.*;
 import loaders.OBJLoader;
+import math.Vector3f;
 import models.GameEntity;
+import models.Light;
 import models.Mesh;
 import renderEngine.Camera;
 import renderEngine.Window;
@@ -14,8 +16,11 @@ import renderEngine.Window;
  */
 public class Game {
 	private GameEntity[] entities;
+	private Light[] lights;
 	private Mesh mesh;
 	private Camera camera;
+	
+	private boolean developerMode = true; //set this if you want to rotate in developer mode with a mouse
 	
 	/**
 	 * Creates a new mesh instance and uses positions, indices and colours of class Main.
@@ -25,16 +30,19 @@ public class Game {
 	public Game() {
 		GameEntity cubeEntity = null;
 		GameEntity pineTree = null;
+		Light light = null;
 		try {
 			System.out.println("[Game.Game]: Creating cube... ");
 			cubeEntity = OBJLoader.loadObjModel("cube", "cubeTexture1");
 			pineTree = OBJLoader.loadObjModel("pineTree", "pineTree");
+			light = new Light(new Vector3f(-10, 0, 10), new Vector3f(1.0f, 0.96f, 0.26f));
 		} catch (Exception e) {
 			System.err.println("[Game.Game] An error has occurred while trying to load a game entity");
 			e.printStackTrace();
 		}
 		System.out.println("[Game.Game] Adding cube to the entities array");
 		entities = new GameEntity[] {pineTree};
+		lights = new Light[] { light };
 		
 		System.out.println("[Game.Game]: Creating a new camera object... ");
 		camera = new Camera();
@@ -61,7 +69,7 @@ public class Game {
 		} else if (window.keys[GLFW_KEY_X]) {
 			entities[0].increaseRotation(2.0f, 0f, 0f);
 		} else if (window.keys[GLFW_KEY_Y]) {
-			entities[0].increaseRotation(0f, 2.0f, 0f);
+			entities[0].increaseRotation(0f, 0.5f, 0f);
 		} else if (window.keys[GLFW_KEY_Z]) {
 			entities[0].increaseRotation(0f, 0f, 2.0f);
 		} else if (window.keys[GLFW_KEY_U]) {
@@ -81,19 +89,19 @@ public class Game {
 		} else if (window.keys[GLFW_KEY_D]) {
 			camera.increasePosition(1.0f, 0f, 0f);
 		}
-		//developmental mode of rotation
-		//if is left clicked and moved at the same time, rotate the scene
-		if(window.getCursorChange() && window.isMouseLeftPressed()) {
-			camera.increaseRotation(window.getDeltaMX(), window.getDeltaMY());
-			window.setCursorChange(false);
+		
+		if (developerMode == true) {
+			if(window.getCursorChange() && window.isMouseLeftPressed()) {
+				camera.increaseRotation(window.getDeltaMX(), window.getDeltaMY());
+				window.setCursorChange(false);
+			}
+		} else {
+			if(window.getCursorChange()) {
+				camera.increaseRotation(window.getDeltaMX(), window.getDeltaMY());
+				window.setCursorChange(false);
+			}
 		}
 		
-		/* "Gaming mode of rotating the camera"
-		if(window.getCursorChange()) {
-			camera.increaseRotation(window.getDeltaMX(), window.getDeltaMY());
-			window.setCursorChange(false);
-		}
-		*/
 		//if is scrolled, zoom in
 		if (window.isScrolled()) {
 			camera.increasePosition(0, 0, -(float)window.getScrollAmount());
@@ -103,6 +111,10 @@ public class Game {
 
 	public GameEntity[] getGameEntities() {
 		return entities;
+	}
+	
+	public Light[] getLights() {
+		return lights;
 	}
 	
 	public Mesh getMesh() {

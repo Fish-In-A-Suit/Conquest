@@ -12,6 +12,7 @@ import java.util.Map;
 
 import math.Matrix4f;
 import math.Vector3f;
+import models.Light;
 import utils.BufferUtilities;
 
 public class ShaderProgram {
@@ -82,7 +83,7 @@ public class ShaderProgram {
 		if (glGetShaderi(shaderID, GL_COMPILE_STATUS) == 1) {
 			System.out.println("[ShaderProgram] " + glGetShaderi(shaderID, GL_SHADER_TYPE) + " has been successfully compiled!");
 		} else {
-			throw new Exception("Error compiling shader code: " + glGetShaderInfoLog(shaderID, 1024));
+			throw new Exception("[ShaderProgram]: Error compiling shader code for shader " + shaderPath + ": " + glGetShaderInfoLog(shaderID, 1024));
 		}
 		
 		glAttachShader(programID, shaderID);
@@ -157,6 +158,11 @@ public class ShaderProgram {
 	
 	public void setUniformVector(String uniformName, Vector3f vec) {
 		glUniform3f(uniforms.get(uniformName), vec.x, vec.y, vec.z);
+	}
+	
+	public void loadLight(Light light) {
+		setUniformVector("lightPosition", light.getPosition());
+		setUniformVector("lightColour", light.getColour());
 	}
 	
 /*	

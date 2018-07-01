@@ -53,7 +53,7 @@ public class Mesh {
 	 * @param texCoords Texture coordinates (used for texture mapping)
 	 * @param texture A Texture object
 	 */
-	public Mesh(float[] vPos, int[] indices, float[] texCoords, renderEngine.Texture texture) {
+	public Mesh(float[] vPos, int[] indices, float[] texCoords, float[] normals, renderEngine.Texture texture) {
 		System.out.println("[Mesh.Mesh]: Creating a new textured Mesh instance... ");
 		
 		vPosBuffer = null;
@@ -79,6 +79,8 @@ public class Mesh {
 			setupIndicesBuffer(indices);
 			
 			setupTextureVbo(texCoords);
+			
+			setupNormalsVbo(normals);
 			
 			textures.add(texture);
 			

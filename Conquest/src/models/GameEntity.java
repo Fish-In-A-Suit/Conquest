@@ -26,11 +26,11 @@ public class GameEntity {
 	 * @param texturePath The path of the texture 
 	 * @throws Exception
 	 */
-	public GameEntity(float[] vPositions, int[] indices, float[] textureCoordinates, String texturePath) throws Exception{
+	public GameEntity(float[] vPositions, int[] indices, float[] textureCoordinates, float[] normals, String texturePath) throws Exception{
 		System.out.println("[GameEntity.GameEntity]: Creating a new model texture...");
 		modelTexture = new renderEngine.Texture(texturePath);
 		System.out.println("[GameEntity.GameEntity]: Creating new mesh based on parameters... ");
-		mesh = new Mesh(vPositions, indices, textureCoordinates, modelTexture);
+		mesh = new Mesh(vPositions, indices, textureCoordinates, normals, modelTexture);
 		
 		System.out.println("[GameEntity.GameEntity]: Initializing position, scale and rotation instance fields... ");
 		position = new Vector3f(0, 0, 0);
@@ -40,7 +40,7 @@ public class GameEntity {
 	
 	public GameEntity(ModelData data, String texturePath) throws Exception {
 		modelTexture = new renderEngine.Texture(texturePath);
-		mesh = new Mesh(data.getVertices(), data.getIndices(), data.getTextureCoordinates(), modelTexture);
+		mesh = new Mesh(data.getVertices(), data.getIndices(), data.getTextureCoordinates(), data.getNormals(), modelTexture);
 		setDefaultPRS();
 	}
 	
