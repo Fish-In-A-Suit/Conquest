@@ -1,20 +1,14 @@
 package loaders;
 
 import java.io.BufferedReader;
-
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import math.Vector2f;
 import math.Vector3f;
 import models.GameEntity;
-import utils.ArrayUtils;
-import utils.FileUtilities;
 
 public class OBJLoader {
 	/**
@@ -61,20 +55,16 @@ public class OBJLoader {
 						Vector3f vertexPos = new Vector3f(Float.parseFloat(splitLine[1]), Float.parseFloat(splitLine[2]), Float.parseFloat(splitLine[3]));
 						Vertex newVertex = new Vertex(vertices.size(), vertexPos); //vertices.size() equals to how much there are currently elements in vertices --> index of the vertex
 						vertices.add(newVertex);
-						//System.out.println("[OBJLoader.loadObjModel]: Vertex " + vertexPos.toString() + " has been added to vertices from " + fileName);
 						break;
 					case "vt":
 						Vector2f texture = new Vector2f(Float.parseFloat(splitLine[1]), Float.parseFloat(splitLine[2]));
 	    				textures.add(texture);
-	    				//System.out.println("[OBJLoader.loadObjModel]: Texture coordinate [" + texture.x +  ", " + texture.y  + "] has been added to textures from " + fileName);
 	    				break;
 					case "vn":
 						Vector3f normal = new Vector3f(Float.parseFloat(splitLine[1]), Float.parseFloat(splitLine[2]), Float.parseFloat(splitLine[3]));
 	    				normals.add(normal);
-	    				//System.out.println("[OBJLoader.loadObjModel]: Normal " + normal + " has been added to normals from " + fileName);
 	    				break;
 					case "f":
-						//System.out.println("found a line starting with f!");
 						String[] vertex1 = splitLine[1].split("/");
 						String[] vertex2 = splitLine[2].split("/");
 						String[] vertex3 = splitLine[3].split("/");
@@ -95,9 +85,9 @@ public class OBJLoader {
 		texturesArray = new float[vertices.size() * 2];
 		normalsArray = new float[vertices.size() * 3];
 		
-		//float furthest = convertDataToArrays(vertices, textures, normals, vertexPosArray, texturesArray, normalsArray);
 		convertDataToArrays(vertices, textures, normals, vertexPosArray, texturesArray, normalsArray);
 		indicesArray = convertIndicesListToArray(indices);
+		
 		ModelData data = new ModelData(vertexPosArray, texturesArray, normalsArray, indicesArray);
 		
 		double end = System.nanoTime();
@@ -129,33 +119,7 @@ public class OBJLoader {
         }
         return indicesArray;
     }
- /*
-    private static float convertDataToArrays(List<Vertex> vertices, List<Vector2f> textures,
-            List<Vector3f> normals, float[] verticesArray, float[] texturesArray,
-            float[] normalsArray) {
-        float furthestPoint = 0;
-        for (int i = 0; i < vertices.size(); i++) {
-            Vertex currentVertex = vertices.get(i);
 
-            if (currentVertex.getLength() > furthestPoint) {
-                furthestPoint = currentVertex.getLength();
-            }
-
-            Vector3f position = currentVertex.getPosition();
-            Vector2f textureCoord = textures.get(currentVertex.getTextureIndex());
-            Vector3f normalVector = normals.get(currentVertex.getNormalIndex());
-            verticesArray[i * 3] = position.x;
-            verticesArray[i * 3 + 1] = position.y;
-            verticesArray[i * 3 + 2] = position.z;
-            texturesArray[i * 2] = textureCoord.x;
-            texturesArray[i * 2 + 1] = 1 - textureCoord.y;
-            normalsArray[i * 3] = normalVector.x;
-            normalsArray[i * 3 + 1] = normalVector.y;
-            normalsArray[i * 3 + 2] = normalVector.z;
-        }
-        return furthestPoint;
-    }
-    */
     private static void convertDataToArrays(List<Vertex> vertices, List<Vector2f> textures,
     		List<Vector3f> normals, float[] verticesArray, float[] texturesArray, float[] normalsArray) {
     	for (int i = 0; i < vertices.size(); i++) {

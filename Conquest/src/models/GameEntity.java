@@ -6,7 +6,9 @@ import models.Mesh;
 import renderEngine.Texture;
 
 /**
- * A class which has references for storing model position, rotation, scale and state
+ * A class which has references for storing model mesh and texture, along with its
+ * position, rotation, scale and state. This class represents a renderable entity, which can
+ * be moved around in the game.
  * @author Aljoša
  *
  */
@@ -26,11 +28,12 @@ public class GameEntity {
 	 * @param texturePath The path of the texture 
 	 * @throws Exception
 	 */
-	public GameEntity(float[] vPositions, int[] indices, float[] textureCoordinates, String texturePath) throws Exception{
+	public GameEntity(float[] vPositions, int[] indices, float[] textureCoordinates, float[] normals, String texturePath) throws Exception{
 		System.out.println("[GameEntity.GameEntity]: Creating a new model texture...");
 		modelTexture = new renderEngine.Texture(texturePath);
+		
 		System.out.println("[GameEntity.GameEntity]: Creating new mesh based on parameters... ");
-		mesh = new Mesh(vPositions, indices, textureCoordinates, modelTexture);
+		mesh = new Mesh(vPositions, indices, textureCoordinates, normals, modelTexture);
 		
 		System.out.println("[GameEntity.GameEntity]: Initializing position, scale and rotation instance fields... ");
 		position = new Vector3f(0, 0, 0);
@@ -38,74 +41,38 @@ public class GameEntity {
 		rotation = new Vector3f(0, 0, 0);
 	}
 	
+	/**
+	 * Creates a new GameEntity out of data found in ModelData and a filepath that specifies a corresponding
+	 * texture. This constructor is used by OBJLoader to load .obj model
+	 * @param data A ModelData instance which holds an array of vertex positional vector components, vertex texture coordinates, vertex normal vector components and an array of indices
+	 * @param texturePath A file path of a corrsponding texture
+	 * @throws Exception
+	 */
 	public GameEntity(ModelData data, String texturePath) throws Exception {
 		modelTexture = new renderEngine.Texture(texturePath);
-		mesh = new Mesh(data.getVertices(), data.getIndices(), data.getTextureCoordinates(), modelTexture);
+		mesh = new Mesh(data.getVertices(), data.getIndices(), data.getTextureCoordinates(), data.getNormals(), modelTexture);
 		setDefaultPRS();
-	}
-	
-	public GameEntity(float[] vPos, float[] texCoords, float[] normals, int[] indices) {
-		mesh = new Mesh(vPos, texCoords, normals, indices);
-		modelTexture = mesh.getTexture();
-		
-		position = new Vector3f(0, 0, 0);
-		scale = 1;
-		rotation = new Vector3f(0, 0, 0);
-	}
-	
-	public GameEntity(float[] vPos, float[] texCoords, float[] normals, int[] indices, String texturePath) {
-		mesh = new Mesh(vPos, texCoords, normals, indices);
-		modelTexture = null;
-		try {
-			modelTexture = new Texture(texturePath);
-		} catch (Exception e) {
-			System.err.println("[Game.Game]: Failed to create modelTexture!");
-			e.printStackTrace();
-		}
-		
-		position = new Vector3f(0, 0, 0);
-		scale = 1;
-		rotation = new Vector3f(0, 0, 0);
-	}
-	
-	/**
-	 * Creates a texture-less GameEntity
-	 * @param vPositions The vertex coordinates of a model
-	 * @param indices The indices of a model (in which order should the vertices be bound by OpenGL?)
-	 * @param colours The colours of the vertices
-	 */
-	public GameEntity(float[] vPositions, int[] indices, float[] colours) {
-		modelTexture = null;
-		mesh = new Mesh(vPositions, indices, colours);
-		
-		position = new Vector3f(0, 0, 0);
-		scale = 1;
-		rotation = new Vector3f(0, 0, 0);
-		
 	}
 	
 	public Vector3f getPosition() {
 		return position;
 	}
 	
-	/**
-	 * This method moves an entity around in the world
-	 * @param x
-	 * @param y
-	 * @param z
-	 */
+	//move the entity around
 	public void updatePosition(float x, float y, float z) {
 		position.x += x * 0.05f;
 	    position.y += y * 0.05f;
 		position.z += z * 0.05f;
 	}
 	
+	//rotate the entity
 	public void increaseRotation(float x, float y, float z) {
 		rotation.x += x * 0.05f;
 		rotation.y += y * 0.05f;
 		rotation.z += z * 0.05f;
 	}
 	
+	//increate the scale of an entity
 	public void increaseScale(float scale) {
 		this.scale += scale * 0.01f;
 	}

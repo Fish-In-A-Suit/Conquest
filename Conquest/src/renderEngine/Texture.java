@@ -18,6 +18,12 @@ import de.matthiasmann.twl.utils.PNGDecoder.Format;
 public class Texture {
 	private final int id;
 	
+	/**
+	 * This constructor creates a Texture instance out of the specified texture path and stores
+	 * the handle for the VRAM-stored texture (along with all of its parameters) as id
+	 * @param texturePath File path to the .png image
+	 * @throws Exception
+	 */
 	public Texture(String texturePath) throws Exception {
 		this(loadTexture(texturePath)); //call for Texture(int id) constructor
 	}

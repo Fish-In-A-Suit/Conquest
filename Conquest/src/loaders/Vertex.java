@@ -4,7 +4,7 @@ import math.Vector3f;
 
 /**
  * This class represents a single vertex of a mesh. A vertex has its associated position,
- * texture and normal index, a duplicateVertex (if it is part of a seam), and an index.
+ * texture and normal index, a duplicateVertex (if it is part of a texture seam), and an index.
  * @author Aljoša
  *
  */

@@ -7,6 +7,7 @@ import shaders.ShaderProgram;
 import utils.FileUtilities;
 import math.Transformations;
 import models.GameEntity;
+import models.Light;
 import models.Mesh;
 
 /**
@@ -62,7 +63,7 @@ public class Renderer {
 	 */
 	
 	int i = 0;
-	public void render(Window window, GameEntity[] entities, Camera camera) {
+	public void render(Window window, GameEntity[] entities, Light[] lights, Camera camera) {
 		i++;
 		
 		clear();
@@ -108,6 +109,11 @@ public class Renderer {
 			
 			mesh.render();
 		}
+		
+		for(Light light : lights) {
+			shaderProgram.loadLight(light);
+		}
+		
 		camera.resetRotation();
 
 		shaderProgram.unbind();
@@ -133,6 +139,8 @@ public class Renderer {
 		shaderProgram.createUniform("texture_sampler");
 		shaderProgram.createUniform("colour");
 		shaderProgram.createUniform("useColour");
+		shaderProgram.createUniform("lightPosition");
+		shaderProgram.createUniform("lightColour");
 	}
 
 	/**

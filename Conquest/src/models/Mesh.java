@@ -48,12 +48,13 @@ public class Mesh {
 	/**
 	 * This constructor creates a renderable object (instance of Mesh with its texture) out of input parameters by storing them
 	 * in the vao of that Mesh instance
-	 * @param vPos The vertex positions of a model
+	 * @param vPos A float array of vertex positional vector components
 	 * @param indices The indices to tell OpenGL how to connect the vertices
 	 * @param texCoords Texture coordinates (used for texture mapping)
+	 * @param normals A float array of vertex normal vector components
 	 * @param texture A Texture object
 	 */
-	public Mesh(float[] vPos, int[] indices, float[] texCoords, renderEngine.Texture texture) {
+	public Mesh(float[] vPos, int[] indices, float[] texCoords, float[] normals, renderEngine.Texture texture) {
 		System.out.println("[Mesh.Mesh]: Creating a new textured Mesh instance... ");
 		
 		vPosBuffer = null;
@@ -80,6 +81,8 @@ public class Mesh {
 			
 			setupTextureVbo(texCoords);
 			
+			setupNormalsVbo(normals);
+			
 			textures.add(texture);
 			
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -92,56 +95,6 @@ public class Mesh {
 			System.out.println("[Mesh.Mesh]:  Indices array: " + ArrayUtils.getIntArray(indices));
 			System.out.println("[Mesh.Mesh]:  Texture coordinates: " + ArrayUtils.getFloatArray(texCoords));
 		}
-	}
-	
-	public Mesh(float[] vPos, float[] texCoords, float[] normals, int[] indices) {
-		System.out.println("Creating a new Mesh instance...");
-		vPosBuffer = null;
-		textureBuffer = null;
-		normalsBuffer = null;
-		indicesBuffer = null;
-		
-		try {
-			colour = DEFAULT_COLOUR;
-			vertexCount = indices.length;
-			vbos = new ArrayList<>();
-			
-			vaoID = glGenVertexArrays();
-			glBindVertexArray(vaoID);
-			
-			setupVerticesVbo(vPos);
-			setupTextureVbo(texCoords);
-			setupNormalsVbo(normals);
-			setupIndicesBuffer(indices);
-			
-			glBindBuffer(GL_ARRAY_BUFFER, 0);
-			glBindVertexArray(0);			
-		} finally {
-			System.out.println("Finished creating Mesh instance");
-			
-			System.out.println("[Mesh.Mesh]: Displaying Mesh information: ");
-			System.out.println("[Mesh.Mesh]:  Vertices array: " + ArrayUtils.getFloatArray(vPos));
-			System.out.println("[Mesh.Mesh]:  Texture coordinates: " + ArrayUtils.getFloatArray(texCoords));
-			System.out.println("[Mesh.Mesh]:  Normals: " + ArrayUtils.getFloatArray(normals));
-			System.out.println("[Mesh.Mesh]:  Indices array: " + ArrayUtils.getIntArray(indices));
-		}
-	}
-	
-	public Mesh(float[] vPos, int[] indices, float[] colours) {
-		vbos = new ArrayList<>();
-		vaos = new ArrayList<>();
-		
-		vertexCount = indices.length;
-		vaoID = glGenVertexArrays();
-		vaos.add(vaoID);
-		glBindVertexArray(vaoID);
-		
-		setupVerticesVbo(vPos);
-		setupIndicesBuffer(indices);
-		setupColourVbo(colours);
-		
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-		glBindVertexArray(0);
 	}
 
 	/**
@@ -156,9 +109,6 @@ public class Mesh {
 		verticesVboID = glGenBuffers();
 		vbos.add(verticesVboID);
 		vPosBuffer = BufferUtilities.storeDataInFloatBuffer(vertices);
-		
-		System.out.println("   - [Mesh] Checking vertices");
-		//checkVertices(vertices);
 		
 		System.out.println("   - [Mesh] Binding verticesVboID to GL_ARRAY_BUFFER...");
 		glBindBuffer(GL_ARRAY_BUFFER, verticesVboID);
@@ -230,6 +180,7 @@ public class Mesh {
 		
 	}
 	
+	/*
 	private void setupColourVbo(float[] colours) {
 		System.out.println("[Mesh] Creating colour vbo (colourVboID)...");
 		colourVboID = glGenBuffers();
@@ -247,7 +198,12 @@ public class Mesh {
 		System.out.println("   - [Mesh] Sending colour vbo to index 1 of the active vao...");
 		glVertexAttribPointer(1, 3, GL_FLOAT, false, 0, 0);
 	}
+	*/
 	
+	/**
+	 * Renders a Mesh with enable attribute lists 0 (vertices), 1 (texture coords) and 2
+	 * (normals) 
+	 */
 	public void render() {
 		if (texture != null) {
 			glActiveTexture(GL_TEXTURE0);

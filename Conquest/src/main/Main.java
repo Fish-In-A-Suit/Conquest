@@ -79,10 +79,10 @@ public class Main implements Runnable {
 				updates ++;
 				delta--;
 			}
-			renderer.render(window, game.getGameEntities(), game.getCamera());		    
+			renderer.render(window, game.getGameEntities(), game.getLights(), game.getCamera());		    
 			frames++;
 			
-			//game.getGameEntities()[0].increaseRotation(1.0f, 0, 1.0f);
+			//game.getGameEntities()[0].increaseRotation(0.0f, 0.5f, 0.0f);
 			
 			if (System.currentTimeMillis() - timer > 1000) {
 				timer += 1000;

@@ -2,6 +2,12 @@ package renderEngine;
 
 import math.Vector3f;
 
+/**
+ * This class represents a camera object. It's informatin (ie position and rotation) are used
+ * by Renderer.render(...) to acquire a viewing matrix.
+ * @author Aljoša
+ *
+ */
 public class Camera {
 	private Vector3f position;
 	private Vector3f rotation;
