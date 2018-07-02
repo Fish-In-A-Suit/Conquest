@@ -22,15 +22,11 @@ public class Game {
 	
 	private boolean developerMode = true; //set this if you want to rotate in developer mode with a mouse
 	
-	/**
-	 * Creates a new mesh instance and uses positions, indices and colours of class Main.
-	 * Creates a new GameEntity object (entity) and passes mesh as parameter
-	 * Creates a new array of GameEntities and stores entity in that array.
-	 */
 	public Game() {
 		GameEntity cubeEntity = null;
 		GameEntity pineTree = null;
 		Light light = null;
+		
 		try {
 			System.out.println("[Game.Game]: Creating cube... ");
 			cubeEntity = OBJLoader.loadObjModel("cube", "cubeTexture1");
@@ -40,7 +36,8 @@ public class Game {
 			System.err.println("[Game.Game] An error has occurred while trying to load a game entity");
 			e.printStackTrace();
 		}
-		System.out.println("[Game.Game] Adding cube to the entities array");
+		
+		System.out.println("[Game.Game] Adding entities to corresponding arrays...");
 		entities = new GameEntity[] {pineTree};
 		lights = new Light[] { light };
 		
@@ -67,11 +64,11 @@ public class Game {
 		} else if (window.keys[GLFW_KEY_LEFT_SHIFT]) {
 			entities[0].updatePosition(0, -1.0f, 0);
 		} else if (window.keys[GLFW_KEY_X]) {
-			entities[0].increaseRotation(2.0f, 0f, 0f);
+			entities[0].increaseRotation(0.5f, 0f, 0f);
 		} else if (window.keys[GLFW_KEY_Y]) {
 			entities[0].increaseRotation(0f, 0.5f, 0f);
 		} else if (window.keys[GLFW_KEY_Z]) {
-			entities[0].increaseRotation(0f, 0f, 2.0f);
+			entities[0].increaseRotation(0f, 0f, 0.5f);
 		} else if (window.keys[GLFW_KEY_U]) {
 			entities[0].increaseRotation(1.0f, 1.0f, 1.0f);
 		} else if (window.keys[GLFW_KEY_B]) {

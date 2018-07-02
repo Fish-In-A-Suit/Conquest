@@ -38,10 +38,7 @@ public class Window {
 	private boolean isScrolled;
 
 	/**
-	 * This method creates the window with it's associated OpenGL context. It also:
-	 *   - sets up a size callback
-	 *   - sets up a key callback
-	 *   - positions the window to the centre of the screen
+	 * This method creates the window with it's associated OpenGL context.
 	 */
 	public void init() {
 		if(glfwInit() == false) {

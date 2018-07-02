@@ -61,13 +61,13 @@ public class ShaderProgram {
 	}
 	
 	/**
+	 * This method creates, populates with source code, compiles the source code and
+	 * attaches a shader object of particular type to the currently active program.
+	 * 
 	 * @param shaderPath The path of the shader-associated file
 	 * @param shaderType The type of a shader object
 	 * @return shaderID The int reference to the modified shader object
 	 * @throws Exception
-	 * 
-	 * This method creates, populates with source code, compiles the source code and
-	 * attaches a shader object of particular type to the currently active program.
 	 */
 	protected int createShader(String shaderPath, int shaderType) throws Exception {
 		int shaderID = glCreateShader(shaderType);
@@ -160,12 +160,18 @@ public class ShaderProgram {
 		glUniform3f(uniforms.get(uniformName), vec.x, vec.y, vec.z);
 	}
 	
+	/**
+	 * This method simulates a light by passing the position and colour Vector3f-s of
+	 * the specified Light instance as uniform variables to the shaders. These two Vector3f-s
+	 * are then used to perform lighting calculations.
+	 * @param light
+	 */
 	public void loadLight(Light light) {
 		setUniformVector("lightPosition", light.getPosition());
 		setUniformVector("lightColour", light.getColour());
 	}
 	
-/*	
+/*	//this can be used instead of layouts in shaders
 	public void defineMappings() {
 		glBindAttribLocation(programID, 0, "position");
 		glBindAttribLocation(programID, 0, "inColour");
