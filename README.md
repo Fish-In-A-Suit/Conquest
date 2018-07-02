@@ -208,4 +208,13 @@ The current program can now create a black window and respond to keyboard events
   - changed Mesh constructor from Mesh(float[] vPos, int[] indices, float[] texCoords, renderEngine.Texture texture) to Mesh(float[] vPos, int[] indices, float[] texCoords, float[] normals, renderEngine.Texture texture)
   - changed the Renderer.render method to accept an array of Light instances: render(Window window, GameEntity[] entities, Light[] lights, Camera camera) 
   
+### snapshot 0.10.1: code cleanup and commenting
+
+**Summary:** Removed several outdates constructors for Mesh and GameEntity and added more comments for better code understanding
+
+**Changes:**
+  - removed Mesh(float[] vPos, float[] texCoords, float[] normals, int[] indices)
+  - removed Mesh(float[] vPos, int[] indices, float[] colours)
+  - removed GameEntity(float[] vPos, float[] texCoords, float[] normals, int[] indices)
+  - removed GameEntity(float[] vPositions, int[] indices, float[] colours)
 
