@@ -67,4 +67,20 @@ public class Vertex {
 	public void setDuplicateVertex(Vertex duplicateVertex) {
 		this.duplicateVertex = duplicateVertex;
 	}
+	
+	public boolean isTextured() {
+		if (textureIndex != -1) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	public void display() {
+		System.out.println("Displaying vertex " + index);
+		System.out.println("  - position: " + position.displayFriendly());
+		System.out.println("  - textureIndex: " + textureIndex);
+		System.out.println("  - normalIndex: " + normalIndex);
+	}
+
 }

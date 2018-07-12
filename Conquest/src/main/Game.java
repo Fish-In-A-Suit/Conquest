@@ -2,8 +2,10 @@ package main;
 
 import static org.lwjgl.glfw.GLFW.*;
 import loaders.OBJLoader;
+import loaders.OBJLoader1;
 import math.Vector3f;
 import models.GameEntity;
+import models.GameEntity1;
 import models.Light;
 import models.Mesh;
 import renderEngine.Camera;
@@ -16,6 +18,7 @@ import renderEngine.Window;
  */
 public class Game {
 	private GameEntity[] entities;
+	private GameEntity1[] entities1; //"animated" entities
 	private Light[] lights;
 	private Mesh mesh;
 	private Camera camera;
@@ -25,20 +28,30 @@ public class Game {
 	public Game() {
 		GameEntity cubeEntity = null;
 		GameEntity pineTree = null;
+		GameEntity brownMushroom = null;
+		GameEntity tobby = null;
+		
 		Light light = null;
 		
 		try {
 			System.out.println("[Game.Game]: Creating cube... ");
 			cubeEntity = OBJLoader.loadObjModel("cube", "cubeTexture1");
 			pineTree = OBJLoader.loadObjModel("pineTree", "pineTree");
+			brownMushroom = OBJLoader.loadObjModel("mushroomBrown", "mushroomBrown");
+			
+			System.out.println("Starting processing Tobby!");
+			tobby = OBJLoader.loadObjModel("tobby", "tobby");
+			
 			light = new Light(new Vector3f(-10, 0, 10), new Vector3f(1.0f, 0.96f, 0.26f));
 		} catch (Exception e) {
+			System.out.println("[Game.Game]: An error has occurred on line " + OBJLoader.lineCount);
 			System.err.println("[Game.Game] An error has occurred while trying to load a game entity");
 			e.printStackTrace();
 		}
 		
 		System.out.println("[Game.Game] Adding entities to corresponding arrays...");
-		entities = new GameEntity[] {pineTree};
+		//entities = new GameEntity[] {pineTree, brownMushroom};
+		entities = new GameEntity[] { tobby };
 		lights = new Light[] { light };
 		
 		System.out.println("[Game.Game]: Creating a new camera object... ");
@@ -108,6 +121,10 @@ public class Game {
 
 	public GameEntity[] getGameEntities() {
 		return entities;
+	}
+	
+	public GameEntity1[] getAnimatedEntities() {
+		return entities1;
 	}
 	
 	public Light[] getLights() {

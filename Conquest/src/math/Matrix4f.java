@@ -1,10 +1,10 @@
 package math;
 
 public class Matrix4f {
-	float m00, m01, m02, m03;
-	float m10, m11, m12, m13;
-	float m20, m21, m22, m23;
-	float m30, m31, m32, m33;
+	public float m00, m01, m02, m03;
+	public float m10, m11, m12, m13;
+	public float m20, m21, m22, m23;
+	public float m30, m31, m32, m33;
 	
 	//for debugging purposes
 	float d_scale;
@@ -21,6 +21,31 @@ public class Matrix4f {
 		m10 = 0.0f;	m11 = 1.0f; m12 = 0.0f; m13 = 0.0f;
 		m20 = 0.0f; m21 = 0.0f; m22 = 1.0f; m23 = 0.0f;
 		m30 = 0.0f; m31 = 0.0f; m32 = 0.0f; m33 = 1.0f;
+	}
+	
+	public Matrix4f(Matrix4fColumn mat) {
+		//diagonal stays the same
+		this.m00 = mat.m00;
+		this.m11 = mat.m11;
+		this.m22 = mat.m22;
+		this.m33 = mat.m33;
+		
+		//lower triangle - copy from mat upper triangle
+		this.m10 = mat.m01;
+		this.m20 = mat.m02;
+		this.m30 = mat.m03;
+		this.m21 = mat.m12;
+		this.m31 = mat.m13;
+		this.m32 = mat.m23;
+		
+		//upper triangle - copy from mat lower triangle
+		this.m01 = mat.m10;
+		this.m02 = mat.m20;
+		this.m03 = mat.m30;
+		this.m12 = mat.m21;
+		this.m13 = mat.m31;
+		this.m23 = mat.m32;
+		
 	}
 	
 	/**
@@ -327,4 +352,68 @@ public class Matrix4f {
 		this.m22 = scale;
 		return this;
 	}
+	
+	/**
+	 * Inverts a matrix
+	 * @return
+	 */
+	public Matrix4f invert() {
+		Matrix4fColumn src = new Matrix4fColumn(this);
+		
+		float a = src.m00 * src.m11 - src.m01 * src.m10;
+	    float b = src.m00 * src.m12 - src.m02 * src.m10;
+	    float c = src.m00 * src.m13 - src.m03 * src.m10;
+	    float d = src.m01 * src.m12 - src.m02 * src.m11;
+	    float e = src.m01 * src.m13 - src.m03 * src.m11;
+	    float f = src.m02 * src.m13 - src.m03 * src.m12;
+	    float g = src.m20 * src.m31 - src.m21 * src.m30;
+	    float h = src.m20 * src.m32 - src.m22 * src.m30;
+	    float i = src.m20 * src.m33 - src.m23 * src.m30;
+	    float j = src.m21 * src.m32 - src.m22 * src.m31;
+	    float k = src.m21 * src.m33 - src.m23 * src.m31;
+	    float l = src.m22 * src.m33 - src.m23 * src.m32;
+	     
+	    float det = a*l - b*k + c*j + d*i - e*h + f*g;
+	    float nm00, nm01, nm02, nm03, nm10, nm11, nm12, nm13, nm20, nm21, nm22, nm23, nm30, nm31, nm32, nm33;
+	    det = 1.0f / det;
+	    nm00 = ( src.m11 * l - src.m12 * k + src.m13 * j) * det;
+	    nm01 = (-src.m01 * l + src.m02 * k - src.m03 * j) * det;
+	    nm02 = ( src.m31 * f - src.m32 * e + src.m33 * d) * det;
+	    nm03 = (-src.m21 * f + src.m22 * e - src.m23 * d) * det;
+	    nm10 = (-src.m10 * l + src.m12 * i - src.m13 * h) * det;
+	    nm11 = ( src.m00 * l - src.m02 * i + src.m03 * h) * det;
+	    nm12 = (-src.m30 * f + src.m32 * c - src.m33 * b) * det;
+	    nm13 = ( src.m20 * f - src.m22 * c + src.m23 * b) * det;
+	    nm20 = ( src.m10 * k - src.m11 * i + src.m13 * g) * det;
+	    nm21 = (-src.m00 * k + src.m01 * i - src.m03 * g) * det;
+	    nm22 = ( src.m30 * e - src.m31 * c + src.m33 * a) * det;
+	    nm23 = (-src.m20 * e + src.m21 * c - src.m23 * a) * det;
+	    nm30 = (-src.m10 * j + src.m11 * h - src.m12 * g) * det;
+	    nm31 = ( src.m00 * j - src.m01 * h + src.m02 * g) * det;
+	    nm32 = (-src.m30 * d + src.m31 * b - src.m32 * a) * det;
+	    nm33 = ( src.m20 * d - src.m21 * b + src.m22 * a) * det;
+	    
+	    //pr - "partial result", since it has to be transformed to row-major 
+	    Matrix4fColumn pr = new Matrix4fColumn();
+	    pr.m00 = nm00;
+	    pr.m01 = nm01;
+	    pr.m02 = nm02;
+	    pr.m03 = nm03;
+	    pr.m10 = nm10;
+	    pr.m11 = nm11;
+	    pr.m12 = nm12;
+	    pr.m13 = nm13;
+	    pr.m20 = nm20;
+	    pr.m21 = nm21;
+	    pr.m22 = nm22;
+	    pr.m23 = nm23;
+	    pr.m30 = nm30;
+	    pr.m31 = nm31;
+	    pr.m32 = nm32;
+	    pr.m33 = nm33;
+	    
+	    return new Matrix4f(pr);
+		
+	}
+	
 }

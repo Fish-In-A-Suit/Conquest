@@ -50,6 +50,12 @@ public class GameEntity {
 	 */
 	public GameEntity(ModelData data, String texturePath) throws Exception {
 		modelTexture = new renderEngine.Texture(texturePath);
+		
+		if (modelTexture.getId() == -1) {
+			//doesn't exist
+			modelTexture = null;
+		}
+		
 		mesh = new Mesh(data.getVertices(), data.getIndices(), data.getTextureCoordinates(), data.getNormals(), modelTexture);
 		setDefaultPRS();
 	}

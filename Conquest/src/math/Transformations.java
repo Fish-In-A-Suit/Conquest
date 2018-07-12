@@ -15,7 +15,7 @@ public class Transformations {
 	public float dAspect;
 	
 	public Transformations() {
-		System.out.println("[Transformation.Transformations()]: Creating translation matrix... ");
+		System.out.println("[Transformation.Transformations()]: Creating matrices ");
 		translationMatrix = new Matrix4f();
 		rotationMatrix = new Matrix4f();
 		scaleMatrix = new Matrix4f();

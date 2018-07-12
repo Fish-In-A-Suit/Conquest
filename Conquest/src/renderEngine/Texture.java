@@ -1,5 +1,6 @@
 package renderEngine;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
@@ -42,37 +43,46 @@ public class Texture {
 	 */
 	private static int loadTexture(String fileName) throws Exception {
 		System.out.println("[Texture.loadTexture]: Loading texture " + fileName + " to the OpenGL context");
-        InputStream in = new FileInputStream(fileName);
-		//InputStream in = Texture.class.getResourceAsStream(fileName);
+        
+		File file = new File(fileName);
+		
+		if (file.exists()) {
+			InputStream in = new FileInputStream(file);
+			//InputStream in = new FileInputStream(fileName);
+			
+		      try {
+				    //load texture contents into a byte buffer
+				    PNGDecoder decoder = new PNGDecoder(in);
+				    ByteBuffer buf = ByteBuffer.allocateDirect(decoder.getWidth()*decoder.getHeight()*4);
+				    decoder.decode(buf, decoder.getWidth()*4, Format.RGBA);
+				    buf.flip();
 
-        try {
-		    //load texture contents into a byte buffer
-		    PNGDecoder decoder = new PNGDecoder(in);
-		    ByteBuffer buf = ByteBuffer.allocateDirect(decoder.getWidth()*decoder.getHeight()*4);
-		    decoder.decode(buf, decoder.getWidth()*4, Format.RGBA);
-		    buf.flip();
-
-			//create a new OpenGL texture
-			int textureId = glGenTextures();
-			//make the texture active
-			glBindTexture(GL_TEXTURE_2D, textureId);
-			
-			glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-			
-			//setup filtering - how OpenGL interpolates pixels when scaling up or down
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-			
-			//setup wrap mode - how OpenGL handles pixels outside of the expected range
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-			
-			//upload the texture data
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, decoder.getWidth(), decoder.getHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE, buf);
-			return textureId;
-		} finally {
-			in.close();
+					//create a new OpenGL texture
+					int textureId = glGenTextures();
+					//make the texture active
+					glBindTexture(GL_TEXTURE_2D, textureId);
+					
+					glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+					
+					//setup filtering - how OpenGL interpolates pixels when scaling up or down
+					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+					
+					//setup wrap mode - how OpenGL handles pixels outside of the expected range
+					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+					
+					//upload the texture data
+					glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, decoder.getWidth(), decoder.getHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE, buf);
+					return textureId;
+				} finally {
+					in.close();
+				}
+		} else {
+			return -1;
 		}
+
+
 	}
 	
 	//not currently used

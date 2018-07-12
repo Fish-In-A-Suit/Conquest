@@ -24,18 +24,29 @@ import utils.BufferUtilities;
  */
 public class Mesh {
 	private int vaoID;
+	
 	private int verticesVboID;
 	private int indicesVboID;
+	private int colourVboID;
 	private int textureVboID;
 	private int normalsVboID;
-	private int colourVboID;
+	private int jointIDsVboID;
+	private int weightsVboID;
 	private int vertexCount;
+	
+	/*
+	 * Create a constructor which handles mesh loading for animated models.
+	 *   - joint ids will be stored at attribute list index 3
+	 *   - vertex weights will be stored at attribute list index 4
+	 */
 	
 	private FloatBuffer vPosBuffer;
 	private FloatBuffer textureBuffer;
 	private FloatBuffer normalsBuffer;
 	private FloatBuffer colourBuffer;
 	private IntBuffer indicesBuffer;
+	private IntBuffer jointIDsBuffer;
+	private FloatBuffer weightsBuffer;
 	
 	private renderEngine.Texture texture;
 	private Vector3f DEFAULT_COLOUR = new Vector3f(0.93f, 0.05f, 0.77f);
@@ -85,10 +96,65 @@ public class Mesh {
 			
 			textures.add(texture);
 			
+			//glBindBuffer(GL_ARRAY_BUFFER, 0);
+			//glBindVertexArray(0);
+		} finally {
+			System.out.println("[Mesh.Mesh]: Textured Mesh instance has been created successfully... ");
+			
+			System.out.println("[Mesh.Mesh]: Displaying Mesh information: ");
+			System.out.println("[Mesh.Mesh]:  Vertices array: " + ArrayUtils.getFloatArray(vPos));
+			System.out.println("[Mesh.Mesh]:  Indices array: " + ArrayUtils.getIntArray(indices));
+			System.out.println("[Mesh.Mesh]:  Texture coordinates: " + ArrayUtils.getFloatArray(texCoords));
+		}
+	}
+	
+	/**
+	 * This constructor creates a Mesh instance which can be animated
+	 * @param vpos
+	 * @param indices
+	 * @param texCoords
+	 * @param normals
+	 * @param texture
+	 * @param jointIDs
+	 * @param weights
+	 */
+	public Mesh(float[] vPos, int[] indices, float[] texCoords, float[] normals, renderEngine.Texture texture, int[] jointIDs, float[] weights) {
+		System.out.println("[Mesh.Mesh]: Creating a new animated Mesh instance... ");
+		
+		vPosBuffer = null;
+		textureBuffer = null;
+		indicesBuffer = null;
+		jointIDsBuffer = null;
+		weightsBuffer = null;
+		
+		try {
+			this.texture = texture;
+		    vertexCount = indices.length;
+		    colour = DEFAULT_COLOUR;
+		    
+		    vbos = new ArrayList<>();
+		    vaos = new ArrayList<>();
+		    textures = new ArrayList<>();
+			
+		    System.out.println("[Mesh] Creating and binding the vao (vaoID)");
+			vaoID = glGenVertexArrays();
+			vaos.add(vaoID);
+			
+			glBindVertexArray(vaoID);
+			
+			setupVerticesVbo(vPos);		
+			setupIndicesBuffer(indices);
+			setupTextureVbo(texCoords);
+			setupNormalsVbo(normals);
+			setupJointIDsVbo(jointIDs);
+			setupWeightsVbo(weights);
+
+			textures.add(texture);
+			
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 			glBindVertexArray(0);
 		} finally {
-			System.out.println("[Mesh.Mesh]: Textured Mesh instance has been created successfully... ");
+			System.out.println("[Mesh.Mesh]: Animated Mesh instance has been created successfully... ");
 			
 			System.out.println("[Mesh.Mesh]: Displaying Mesh information: ");
 			System.out.println("[Mesh.Mesh]:  Vertices array: " + ArrayUtils.getFloatArray(vPos));
@@ -180,6 +246,28 @@ public class Mesh {
 		
 	}
 	
+	private void setupJointIDsVbo(int[] jointIDs) {
+		System.out.println("  - [Mesh.setupJointIDsVbo]: Setting up jointIDs vbo...");
+		jointIDsVboID = glGenBuffers();
+		vbos.add(jointIDsVboID);
+		jointIDsBuffer = BufferUtilities.storeDataInIntBuffer(jointIDs);
+		glBindBuffer(GL_ARRAY_BUFFER, jointIDsVboID);
+        glBufferData(GL_ARRAY_BUFFER, jointIDsBuffer, GL_STATIC_DRAW);
+        glVertexAttribIPointer(3, 3, GL_INT, 0, 0);
+        //change the second 0 if there are errors
+	}
+	
+	private void setupWeightsVbo(float[] weights) {
+		System.out.println("  - [Mesh.setupJointIDsVbo]: Setting up weights vbo...");
+		weightsVboID = glGenBuffers();
+		vbos.add(weightsVboID);
+		weightsBuffer = BufferUtilities.storeDataInFloatBuffer(weights);
+		glBindBuffer(GL_ARRAY_BUFFER, weightsVboID);
+		glBufferData(GL_ARRAY_BUFFER, weightsBuffer, GL_STATIC_DRAW);
+		glVertexAttribPointer(4, 3, GL_FLOAT, false, 0, 0);
+		//change the second 0 if there are errors
+	}
+	
 	/*
 	private void setupColourVbo(float[] colours) {
 		System.out.println("[Mesh] Creating colour vbo (colourVboID)...");
@@ -211,15 +299,16 @@ public class Mesh {
 			glBindTexture(GL_TEXTURE_2D, texture.getId());
 		}
 		
-		glBindVertexArray(getVaoID());
+		//glBindVertexArray(getVaoID());
+		glBindVertexArray(vaoID);
 		
 		glEnableVertexAttribArray(0);
 		glEnableVertexAttribArray(1);
 		glEnableVertexAttribArray(2);
 		
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, getIndicesVboID());
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indicesVboID);
 
-		glDrawElements(GL_TRIANGLES, getVertexCount(), GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_TRIANGLES, vertexCount, GL_UNSIGNED_INT, 0);
 		
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 		
@@ -309,9 +398,4 @@ public class Mesh {
 	public Vector3f getColour() {
 		return colour;
 	}
-	
-
-	
-	
-
 }
